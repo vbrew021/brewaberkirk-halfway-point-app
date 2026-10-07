@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Replace YOUR-FAMILY-CODE (both places) with the code your family will type in.
+    match /halfway/{code}/picks/{pickId} {
+      allow read, delete: if code == 'YOUR-FAMILY-CODE';
+      allow create, update: if code == 'YOUR-FAMILY-CODE'
+        && request.resource.data.keys().hasOnly(['c', 'n', 'w', 'f'])
+        && request.resource.data.c is string && request.resource.data.c.size() <= 200
+        && request.resource.data.n is string && request.resource.data.n.size() <= 200
+        && request.resource.data.w is string && request.resource.data.w.size() <= 200
+        && request.resource.data.f is list && request.resource.data.f.size() <= 3;
+    }
+  }
+}
