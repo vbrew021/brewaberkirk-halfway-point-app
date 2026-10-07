@@ -163,6 +163,35 @@ select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);backgroun
 .sync-row{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
 .sync-row input{font:inherit;font-size:16px;flex:1;min-width:180px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--ink)}
 .live{font-size:14px;font-weight:600;color:var(--tx);margin:10px 0 0}
+
+:root{--custom:#7A4B9C;--custom-soft:#EADCF5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--custom:#C9A3E6;--custom-soft:#3A2A4A}}
+:root[data-theme="dark"]{--custom:#C9A3E6;--custom-soft:#3A2A4A}
+.legend i.ring{width:14px;height:14px;border-radius:50%;border:3px dashed var(--custom);box-sizing:border-box}
+.chip.custom{border:2px dashed var(--custom);color:var(--custom);font-style:italic;font-weight:600}
+.chip.custom[aria-pressed="true"]{background:var(--custom);border-color:var(--custom);color:#fff}
+.plus{font-style:normal;font-weight:800;margin-right:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.list li.custom{outline:2px dashed var(--custom);outline-offset:-2px;border-radius:10px;padding:12px 10px;background:var(--custom-soft);border-bottom:0;margin:6px 0}
+.list li.custom::before{content:"+";background:var(--custom);color:#fff}
+.list li.custom a{color:var(--ink)}
+.tag.added{color:#fff;border:0;background:var(--custom)}
+.tag.added.fBrew{background:#1B4FA0}.tag.added.fAber{background:#0E6B4F}.tag.added.fKirk{background:#7A4B9C}
+.linkbtn{font:inherit;font-size:14px;background:none;border:0;padding:4px 2px;color:var(--muted);text-decoration:underline;cursor:pointer}
+.linkbtn:focus-visible{outline:3px solid var(--line);outline-offset:2px}
+.btn.ghost{border-style:dashed;border-color:var(--custom);color:var(--custom)}
+.suggest{margin:12px 0 4px}
+.add-form{border:2px dashed var(--custom);border-radius:12px;padding:14px;margin-top:10px;background:var(--land);display:flex;flex-direction:column;gap:6px}
+.add-form label{font-size:14px;font-weight:600;color:var(--muted)}
+.form-title{margin:0 0 4px;font-weight:800}
+.opt{font-weight:400;color:var(--muted)}
+.txt{font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--paper);color:var(--ink);width:100%}
+.add-dest{margin:-6px 0 18px}
+.dest-results{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.dest-results .status{width:100%}
+.custom-note{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;padding:10px 12px;border:2px dashed var(--custom);border-radius:10px;font-size:14px;color:var(--custom);font-weight:600}
+.hint{margin:-2px 0 4px;font-size:13px;color:var(--muted)}
+textarea.copy{font:inherit;font-size:14px}
 </style>
 </head>
 <body>
@@ -183,6 +212,7 @@ select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);backgroun
     <span><i style="height:4px;background:var(--line)"></i>Halfway line</span>
     <span><i style="border-top:2px dashed var(--mi)"></i><span id="legA"></span></span>
     <span><i style="border-top:2px dashed var(--tx)"></i><span id="legB"></span></span>
+    <span><i class="ring"></i>Added by the family</span>
   </div>
 
   <section class="setup" aria-labelledby="setupTitle">
@@ -201,6 +231,15 @@ select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);backgroun
 
   <h2>Choose a meeting city</h2>
   <div class="chips" id="chips"></div>
+  <div class="add-dest">
+    <button type="button" class="btn ghost" id="addDestBtn" aria-expanded="false" aria-controls="addDestForm">+ Add a destination</button>
+    <div id="addDestForm" class="add-form" hidden>
+      <label for="destQ">City or town</label>
+      <div class="sync-row"><input id="destQ" autocomplete="off" placeholder="For example, Branson, MO"><button type="button" class="btn" id="destSearch">Find</button></div>
+      <p class="err" id="destErr" hidden></p>
+      <div id="destResults" class="dest-results"></div>
+    </div>
+  </div>
   <div class="panel" id="panel"></div>
   <p class="note" id="note"></p>
 
@@ -219,11 +258,12 @@ select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);backgroun
     </div>
     <p class="live" id="liveStatus" hidden></p>
     <p class="err" id="whoErr" hidden>Choose your family above first, then tap the star again.</p>
-    <p class="actsSub" id="picksHint">Tap the star on any activity, restaurant or place to stay. Share your picks with the family, then map them as a route.</p>
+    <p class="actsSub" id="picksHint">Tap the star on any activity, restaurant or place to stay, then map your picks as a route. Choosing your family here also labels anything you add.</p>
     <ul id="pickList" class="pick-list"></ul>
     <div class="pick-actions">
       <a class="btn" id="mapPicks" target="_blank" rel="noopener">Map our picks</a>
       <button type="button" class="btn" id="sharePicks">Share our picks</button>
+      <button type="button" class="btn" id="copySuggest">Copy suggestions for Claude</button>
     </div>
     <p class="status" id="shareStatus" role="status"></p>
   </section>
@@ -242,22 +282,26 @@ select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);backgroun
     <h2 id="inTitle">Indoor things to do</h2>
     <p class="actsSub" id="inCount"></p>
     <ol id="actsIn" class="list"></ol>
+    <div class="suggest" data-sec="in"></div>
   </section>
   <section class="acts" aria-live="polite">
     <h2 id="outTitle">Outdoor things to do</h2>
     <p class="actsSub" id="outCount"></p>
     <ol id="actsOut" class="list"></ol>
+    <div class="suggest" data-sec="out"></div>
   </section>
   <section class="acts" aria-live="polite">
     <h2 id="eatsTitle">Family-friendly places to eat</h2>
     <p class="actsSub">Casual, local favorites with something for picky eaters. Restaurants change often, so check hours before you go.</p>
     <ol id="eats" class="list"></ol>
+    <div class="suggest" data-sec="eat"></div>
   </section>
   <section class="acts" aria-live="polite">
     <h2 id="stayTitle">Places to stay</h2>
     <p class="actsSub" id="staySub"></p>
     <div class="stay-links" id="stayLinks"></div>
     <ol id="stays" class="list"></ol>
+    <div class="suggest" data-sec="stay"></div>
   </section>
   <section class="acts cost" aria-live="polite">
     <h2 id="costTitle">Rough trip cost</h2>
@@ -326,15 +370,17 @@ const PAIRS={
 };
 const AIRPORTS={"Seattle, WA":['SEA','Seattle-Tacoma International',47.4502,-122.3088],"Spokane, WA":['GEG','Spokane International',47.6199,-117.5338],"Butte, MT":['BTM','Bert Mooney',45.9548,-112.4975],"Kearney, NE":['EAR','Kearney Regional',40.727,-99.0068],"Topeka, KS":['MCI','Kansas City International',39.2976,-94.7139],"Springfield, MO":['SGF','Springfield-Branson National',37.2457,-93.3886],"Memphis, TN":['MEM','Memphis International',35.0424,-89.9767],"Columbus, GA":['CSG','Columbus Airport',32.5163,-84.9389],"Valdosta, GA":['VLD','Valdosta Regional',30.7825,-83.2767],"Jacksonville, FL":['JAX','Jacksonville International',30.4941,-81.6879]};
 PAIRS.fly.cities.forEach(c=>AIRPORTS[c[6]]=c[7]);
+const STATES={Alabama:'AL',Alaska:'AK',Arizona:'AZ',Arkansas:'AR',California:'CA',Colorado:'CO',Connecticut:'CT',Delaware:'DE','District of Columbia':'DC',Florida:'FL',Georgia:'GA',Hawaii:'HI',Idaho:'ID',Illinois:'IL',Indiana:'IN',Iowa:'IA',Kansas:'KS',Kentucky:'KY',Louisiana:'LA',Maine:'ME',Maryland:'MD',Massachusetts:'MA',Michigan:'MI',Minnesota:'MN',Mississippi:'MS',Missouri:'MO',Montana:'MT',Nebraska:'NE',Nevada:'NV','New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',Ohio:'OH',Oklahoma:'OK',Oregon:'OR',Pennsylvania:'PA','Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD',Tennessee:'TN',Texas:'TX',Utah:'UT',Vermont:'VT',Virginia:'VA',Washington:'WA','West Virginia':'WV',Wisconsin:'WI',Wyoming:'WY'};
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const DEF={gas:3.5,mpg:24,carsMi:2,carsTx:1,nights:3,rooms:3,rate:180};
 let S=Object.assign({},DEF,store.get('bak-settings',{}));
-let picks=store.get('bak-picks',{});
+let picks=store.get('bak-picks',{}),customs=store.get('bak-custom',{}),places=store.get('bak-places',{});
 let fam=store.get('bak-fam',null);
 let fares=store.get('bak-fares',{});
-const filters=new Set();
+const filters=new Set(),openForms=new Set();
 const $=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const uid=()=>'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const svg=d3.select('#map');
 const states=topojson.feature(US,US.objects.states).features.filter(f=>!['02','15','72','60','66','69','78'].includes(f.id));
 const proj=d3.geoAlbersUsa().fitExtent([[12,12],[W-12,H-12]],{type:'FeatureCollection',features:states});
@@ -348,16 +394,25 @@ const dist=(p,q)=>Math.round(d3.geoDistance([p[1],p[0]],[q[1],q[0]])*R);
 const gm=(o,d)=>'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(o)+'&destination='+encodeURIComponent(d)+'&travelmode=driving';
 const gf=(o,d)=>'https://www.google.com/travel/flights?q='+encodeURIComponent('Nonstop flights from '+o+' to '+d);
 const gq=(n,city)=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(n+' near '+city);
+const gs=q=>'https://www.google.com/search?q='+encodeURIComponent(q);
 const money=n=>'$'+Math.round(n).toLocaleString();
 const chipsEl=$('chips'),panel=$('panel');
-let P,pairKey,segG,dots,cur=0,city;
-const party=()=>{const mi=6+($('adultKid').checked?1:0);return{mi,tx:3,adults:6+($('adultKid').checked?1:0),kids:3}};
+let P,pairKey,segG,dots,CITIES=[],city;
+const isCustom=c=>!!c[8];
+const party=()=>{const x=$('adultKid').checked?1:0;return{mi:6+x,tx:3,adults:6+x,kids:3}};
 function setParty(){const p=party();
   $('party').textContent=`Brew & Kirk: ${p.mi} people (${$('adultKid').checked?'5':'4'} Brews and 2 Kirks). Aber: 3 people. Everyone together: ${p.mi+p.tx}, including kids 10, 8 and 5.`;}
-function drawPair(key){
+function customCities(){
+  const have=new Set(P.cities.map(c=>c[6]));
+  return Object.entries(places).filter(([id,p])=>p&&typeof p.lat==='number'&&!have.has(p.name+', '+p.st))
+    .sort((a,b)=>b[1].lat-a[1].lat)
+    .map(([id,p])=>[p.name,p.lat,p.lon,'start',10,-10,p.name+', '+p.st,null,id]);
+}
+function drawPair(key,keepKey,resetOrigins){
   pairKey=key;P=PAIRS[key];layer.selectAll('*').remove();
+  if(resetOrigins){$('miFrom').value=P.mi;$('txFrom').value=P.tx;}
+  CITIES=P.cities.concat(customCities());
   const A=ORIG[P.mi].ll,B=ORIG[P.tx].ll;
-  $('miFrom').value=P.mi;$('txFrom').value=P.tx;
   const a=vec(...A),b=vec(...B);
   const n=nrm(a.map((x,i)=>x-b[i])),u=nrm(a.map((x,i)=>x+b[i])),v=cross(n,u);
   const pts=[];
@@ -367,10 +422,15 @@ function drawPair(key){
   segG=layer.append('g');
   layer.append('path').datum({type:'LineString',coordinates:pts}).attr('d',path).attr('fill','none').attr('stroke','var(--line)').attr('stroke-width',5).attr('stroke-linecap','round');
   dots=layer.append('g');
-  P.cities.forEach((c,i)=>{const p=proj([c[2],c[1]]);if(!p)return;
+  CITIES.forEach((c,i)=>{const p=proj([c[2],c[1]]);if(!p)return;
     const g=dots.append('g').style('cursor','pointer').on('click',()=>select(i));
-    g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',5).attr('fill','var(--ink)').attr('class','dot dot'+i);
-    g.append('text').attr('class','lbl').attr('x',p[0]+c[4]).attr('y',p[1]+c[5]).attr('text-anchor',c[3]).attr('dominant-baseline','central').attr('font-size',16).text(c[0]);});
+    if(isCustom(c)){
+      g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',8).attr('fill','var(--land)').attr('stroke','var(--custom)').attr('stroke-width',3).attr('stroke-dasharray','4 3').attr('class','dot dot'+i);
+      g.append('text').attr('class','lbl').attr('x',p[0]+c[4]).attr('y',p[1]+c[5]).attr('text-anchor',c[3]).attr('dominant-baseline','central').attr('font-size',16).attr('font-style','italic').attr('font-weight',600).style('fill','var(--custom)').text(c[0]);
+    }else{
+      g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',5).attr('fill','var(--ink)').attr('class','dot dot'+i);
+      g.append('text').attr('class','lbl').attr('x',p[0]+c[4]).attr('y',p[1]+c[5]).attr('text-anchor',c[3]).attr('dominant-baseline','central').attr('font-size',16).text(c[0]);
+    }});
   [[ORIG[P.mi].s,A,'start',10,-8,'var(--mi)'],[ORIG[P.tx].s,B,'end',-10,6,'var(--tx)']].forEach(e=>{
     const p=proj([e[1][1],e[1][0]]);
     layer.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',8).attr('fill',e[5]).attr('stroke','var(--halo)').attr('stroke-width',2);
@@ -378,72 +438,110 @@ function drawPair(key){
   $('shieldA').textContent=ORIG[P.mi].n;$('shieldB').textContent=ORIG[P.tx].n;
   $('map').setAttribute('aria-label','Map of the continental United States with the halfway line between '+ORIG[P.mi].n+' and '+ORIG[P.tx].n);
   chipsEl.innerHTML='';
-  P.cities.forEach((c,i)=>{const b=document.createElement('button');b.className='chip';b.dataset.i=i;
+  CITIES.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.className='chip'+(isCustom(c)?' custom':'');b.dataset.i=i;
     b.setAttribute('aria-pressed','false');b.onclick=()=>select(i);chipsEl.appendChild(b);});
   document.querySelectorAll('.toggle button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.pair===key?'true':'false'));
-  select(Math.floor(P.cities.length/2)-1);
+  let idx=keepKey?CITIES.findIndex(c=>c[6]===keepKey):-1;
+  if(idx<0)idx=Math.floor(P.cities.length/2)-1;
+  select(idx);
 }
-function chipLabels(){[...chipsEl.children].forEach(b=>{const c=P.cities[+b.dataset.i];const n=Object.values(picks).filter(p=>p.c===c[6]).length;b.innerHTML=esc(c[0])+(n?` <span class="badge">${n}</span>`:'')});}
+function chipLabels(){[...chipsEl.children].forEach(b=>{const c=CITIES[+b.dataset.i];const n=Object.values(picks).filter(p=>p.c===c[6]).length;b.innerHTML=(isCustom(c)?'<span class="plus" aria-hidden="true">+</span>':'')+esc(c[0])+(isCustom(c)?' <span class="sr">(added by the family)</span>':'')+(n?` <span class="badge">${n}</span>`:'')});}
 function originTexts(){
   const mi=ORIG[$('miFrom').value],tx=ORIG[$('txFrom').value];
-  $('legA').textContent='From '+ORIG[P.mi].s;$('legB').textContent='From '+ORIG[P.tx].s;
-  $('lede').textContent=P.mode==='drive'
-   ?`Every spot on the yellow line is equally far, as the crow flies, from ${ORIG[P.mi].s} and ${ORIG[P.tx].s}. Pick a city near the line for driving directions, things to do, food, lodging and a rough trip cost.`
-   :`Every spot on the yellow line is equally far, as the crow flies, from ${ORIG[P.mi].s} and ${ORIG[P.tx].s}. Pick a city near the line for nonstop flight searches, things to do, food, lodging and a rough trip cost.`;
+  $('legA').textContent='From '+mi.s;$('legB').textContent='From '+tx.s;
+  $('lede').textContent=`Every spot on the yellow line is equally far, as the crow flies, from ${ORIG[P.mi].s} and ${ORIG[P.tx].s}. Pick a city near the line, or add your own, for ${P.mode==='drive'?'driving directions':'flight searches'}, things to do, food, lodging and a rough trip cost.`;
   $('note').textContent=P.mode==='drive'
    ?'Straight-line miles are measured over the Earth\u2019s surface. Driving time and road miles come from Google Maps when you open a route, so they reflect current traffic and roads.'
    :'Straight-line miles are measured between airports. Flight searches open in Google Flights filtered to nonstop flights; if a route has no nonstop service, remove the filter to see the quickest connection. Nonstops to smaller airports can be seasonal.';
   return{mi,tx};
 }
-const card=(cls,from,to,meta,url,go,col)=>`<a class="dir" style="--c:${col}" href="${url}" target="_blank" rel="noopener"><div class="from">${from}</div><div class="to">${to}</div><div class="meta">${meta}</div><span class="go">${go}</span></a>`;
+const card=(from,to,meta,url,go,col)=>`<a class="dir" style="--c:${col}" href="${url}" target="_blank" rel="noopener"><div class="from">${from}</div><div class="to">${to}</div><div class="meta">${meta}</div><span class="go">${go}</span></a>`;
 function renderPanel(){
   const {mi,tx}=originTexts(),c=city,T=[c[1],c[2]],ap=AIRPORTS[c[6]];
+  let h='';
   if(P.mode==='drive'){
-    panel.innerHTML=card('',`Brew &amp; Kirk from ${mi.n}`,esc(c[6]),dist(mi.ll,T).toLocaleString()+' miles straight-line',gm(mi.n,c[6]),'Open driving directions','var(--mi)')
-     +card('',`Aber from ${tx.n}`,esc(c[6]),dist(tx.ll,T).toLocaleString()+' miles straight-line',gm(tx.n,c[6]),'Open driving directions','var(--tx)');
+    h=card(`Brew &amp; Kirk from ${mi.n}`,esc(c[6]),dist(mi.ll,T).toLocaleString()+' miles straight-line',gm(mi.n,c[6]),'Open driving directions','var(--mi)')
+     +card(`Aber from ${tx.n}`,esc(c[6]),dist(tx.ll,T).toLocaleString()+' miles straight-line',gm(tx.n,c[6]),'Open driving directions','var(--tx)');
   }else{
-    const f=(o)=>card('',`From ${o.ap[0]} \u00b7 ${o.ap[1]}`,`${ap[0]} \u00b7 ${esc(ap[1])}`,dist([o.ap[2],o.ap[3]],[ap[2],ap[3]]).toLocaleString()+' miles between airports',gf(o.ap[0],ap[0]),'Search nonstop flights',o===mi?'var(--mi)':'var(--tx)');
-    panel.innerHTML=f(mi)+f(tx);
+    const f=(o,col)=>ap?card(`From ${o.ap[0]} \u00b7 ${o.ap[1]}`,`${ap[0]} \u00b7 ${esc(ap[1])}`,dist([o.ap[2],o.ap[3]],[ap[2],ap[3]]).toLocaleString()+' miles between airports',gf(o.ap[0],ap[0]),'Search nonstop flights',col)
+      :card(`From ${o.ap[0]} \u00b7 ${o.ap[1]}`,esc(c[6]),dist([o.ap[2],o.ap[3]],T).toLocaleString()+' miles straight-line; Google Flights suggests the nearest airports',gf(o.ap[0],c[6]),'Search nonstop flights',col);
+    h=f(mi,'var(--mi)')+f(tx,'var(--tx)');
   }
+  if(isCustom(c)){const p=places[c[8]]||{};
+    h+=`<div class="custom-note"><span>Added by ${esc(p.by||'the family')}. Distances are from the city center.</span><button type="button" class="linkbtn" id="removeDest">Remove ${esc(c[0])} from the map</button></div>`;}
+  panel.innerHTML=h;
+  if(isCustom(c))$('removeDest').onclick=()=>{if(confirm(`Remove ${c[0]} from the map for everyone? Suggestions added for it are kept.`))removePlace(c[8]);};
   segG.selectAll('*').remove();
   [[mi.ll,'var(--mi)'],[tx.ll,'var(--tx)']].forEach(([o,col])=>segG.append('path').datum({type:'LineString',coordinates:[[o[1],o[0]],[c[2],c[1]]]})
     .attr('d',path).attr('fill','none').attr('stroke',col).attr('stroke-width',2.5).attr('stroke-dasharray','8 6'));
 }
 const TAGNAME={F:'Free',L:'5-year-old',G:'Grandparents',T:'19-year-old',S:'Seasonal'};
 const pid=(cn,n)=>cn+'|'+n;
-function itemHTML(a,cn,tags,type){
-  const id=pid(cn,a[0]),on=!!picks[id];
-  const badges=(tags||'').split('').map(t=>`<span class="tag t${t}">${TAGNAME[t]}</span>`).join('');
-  return `<li><div class="item"><a href="${gq(a[0],cn)}" target="_blank" rel="noopener">${esc(a[0])}</a><span class="where">${esc(a[1])}</span><p>${esc(a[2])}</p>${badges?`<div class="tags">${badges}</div>`:''}</div>
-   <button type="button" class="star" aria-pressed="${on}" aria-label="${on?'Remove':'Add'} ${esc(a[0])} ${on?'from':'to'} our picks" data-id="${esc(id)}" data-n="${esc(a[0])}" data-w="${esc(a[1])}" data-t="${type}">${on?'\u2605':'\u2606'}</button></li>`;
+function starBtn(n,w,cn){const id=pid(cn,n),on=!!picks[id];
+  return `<button type="button" class="star" aria-pressed="${on}" aria-label="${on?'Remove':'Add'} ${esc(n)} ${on?'from':'to'} our picks" data-id="${esc(id)}" data-n="${esc(n)}" data-w="${esc(w)}">${on?'\u2605':'\u2606'}</button>`;}
+function itemHTML(a,cn,tags){
+  const badges=(tags||'').split('').filter(Boolean).map(t=>`<span class="tag t${t}">${TAGNAME[t]}</span>`).join('');
+  return `<li><div class="item"><a href="${gq(a[0],cn)}" target="_blank" rel="noopener">${esc(a[0])}</a><span class="where">${esc(a[1])}</span><p>${esc(a[2])}</p>${badges?`<div class="tags">${badges}</div>`:''}</div>${starBtn(a[0],a[1],cn)}</li>`;
+}
+function customHTML(id,v,cn){
+  const href=v.u&&validLink(v.u)?v.u:gq(v.n,cn);
+  return `<li class="custom"><div class="item"><a href="${esc(href)}" target="_blank" rel="noopener">${esc(v.n)}</a>${v.w?`<span class="where">${esc(v.w)}</span>`:''}${v.d?`<p>${esc(v.d)}</p>`:''}
+   <div class="tags"><span class="tag added f${esc(v.by)}">Added by ${esc(v.by||'family')}</span><button type="button" class="linkbtn rm" data-rm="${esc(id)}" aria-label="Remove ${esc(v.n)}">Remove</button></div></div>${starBtn(v.n,v.w||'',cn)}</li>`;
 }
 function passes(tags){for(const f of filters){if(f==='noS'){if(tags.includes('S'))return false}else if(!tags.includes(f))return false}return true}
+const SECS={in:['actsIn','inTitle','Indoor things to do near ','indoor activity'],out:['actsOut','outTitle','Outdoor things to do near ','outdoor activity'],eat:['eats','eatsTitle','Family-friendly places to eat near ','restaurant'],stay:['stays','stayTitle','Places to stay near ','place to stay']};
+function customsFor(cn,sec){return Object.entries(customs).filter(([id,v])=>v&&v.city===cn&&v.sec===sec);}
+function validLink(u){try{const x=new URL(u);return x.protocol==='https:'||x.protocol==='http:';}catch(e){return false;}}
+function nameFromLink(u){try{const x=new URL(u);const m=x.pathname.match(/\/maps\/place\/([^/]+)/);if(m)return decodeURIComponent(m[1].replace(/\+/g,' ')).trim();
+  const q=x.searchParams.get('q')||x.searchParams.get('query');if(q&&!/^-?\d/.test(q))return q.split(',')[0].trim();}catch(e){}return '';}
+function renderSuggest(sec){
+  const box=document.querySelector(`.suggest[data-sec="${sec}"]`),label=SECS[sec][3],open=openForms.has(sec);
+  box.innerHTML=open?`<div class="add-form"><p class="form-title">Suggest a${/^[aeiou]/.test(label)?'n':''} ${label} near ${esc(city[0])}</p>
+    <label for="su-${sec}">Google Maps link <span class="opt">(optional)</span></label><input id="su-${sec}" class="txt" type="url" inputmode="url" maxlength="500" autocomplete="off" placeholder="Paste a link from Google Maps">
+    <p class="hint">In Google Maps, open the place, tap Share, then Copy link. Full-length links fill in the name for you.</p>
+    <label for="sn-${sec}">Name</label><input id="sn-${sec}" class="txt" maxlength="120" autocomplete="off">
+    <label for="sw-${sec}">Where <span class="opt">(optional)</span></label><input id="sw-${sec}" class="txt" maxlength="80" autocomplete="off" placeholder="Neighborhood or town">
+    <label for="sd-${sec}">Why it's good <span class="opt">(optional)</span></label><input id="sd-${sec}" class="txt" maxlength="200" autocomplete="off">
+    <p class="err" id="se-${sec}" hidden></p>
+    <div class="pick-actions"><button type="button" class="btn" data-save="${sec}">Add suggestion</button><button type="button" class="linkbtn" data-cancel="${sec}">Cancel</button></div></div>`
+    :`<button type="button" class="btn ghost" data-open="${sec}">+ Suggest a${/^[aeiou]/.test(label)?'n':''} ${label}</button>`;
+}
 function renderLists(){
-  const c=city,cn=c[6],d=DATA[cn]||{},tg=TAGS[cn]||{in:[],out:[]};
-  [['in','actsIn','inTitle','inCount','Indoor things to do near '],['out','actsOut','outTitle','outCount','Outdoor things to do near ']].forEach(([k,id,tid,cid,pre])=>{
+  const c=city,cn=c[6],d=DATA[cn]||{},tg=TAGS[cn]||{in:[],out:[]},custom=isCustom(c);
+  ['in','out'].forEach(k=>{const [id,tid,pre]=SECS[k],cid=k==='in'?'inCount':'outCount';
     $(tid).textContent=pre+c[0];
-    const rows=(d[k]||[]).map((a,i)=>[a,tg[k][i]||'']).filter(r=>passes(r[1]));
-    $(id).innerHTML=rows.map(r=>itemHTML(r[0],cn,r[1],k)).join('');
-    $(cid).textContent=filters.size?`${rows.length} of ${(d[k]||[]).length} match your filters.`:(k==='in'?'Picked for kids 10, 8 and 5, with grandparents and a 19-year-old in mind. Tap a name to find it on Google Maps.':'Several are seasonal, so check dates and hours before you go.');
-    if(filters.size&&!rows.length)$(id).innerHTML='<li class="empty">Nothing here matches every filter. Turn one off to see more.</li>';
+    const base=(d[k]||[]).map((a,i)=>[a,(tg[k]||[])[i]||'']);
+    const rows=base.filter(r=>passes(r[1]));
+    const cust=customsFor(cn,k);
+    let h=rows.map(r=>itemHTML(r[0],cn,r[1])).join('');
+    if(filters.size){if(!rows.length&&base.length)h='<li class="empty">Nothing here matches every filter. Turn one off to see more.</li>';
+      if(cust.length)h+=`<li class="empty">${cust.length} family suggestion${cust.length>1?'s are':' is'} hidden while filters are on.</li>`;}
+    else h+=cust.map(([i,v])=>customHTML(i,v,cn)).join('');
+    if(!base.length&&!cust.length)h=`<li class="empty">No suggestions yet for ${esc(c[0])}. Add one below, or <a href="${gs((k==='in'?'indoor ':'outdoor ')+'things to do with kids in '+cn)}" target="_blank" rel="noopener">look for ideas</a>.</li>`;
+    $(id).innerHTML=h;
+    $(cid).textContent=filters.size?`${rows.length} of ${base.length} match your filters.`:(k==='in'?'Picked for kids 10, 8 and 5, with grandparents and a 19-year-old in mind. Tap a name to find it on Google Maps.':'Several are seasonal, so check dates and hours before you go.');
   });
-  $('eatsTitle').textContent='Family-friendly places to eat near '+c[0];
-  $('eats').innerHTML=(d.eat||[]).map(a=>itemHTML(a,cn,'','eat')).join('');
+  $('eatsTitle').textContent=SECS.eat[2]+c[0];
+  const ce=customsFor(cn,'eat');
+  $('eats').innerHTML=(d.eat||[]).map(a=>itemHTML(a,cn,'')).join('')+ce.map(([i,v])=>customHTML(i,v,cn)).join('')
+    ||`<li class="empty">No suggestions yet for ${esc(c[0])}. Add one below, or <a href="${gs('family friendly restaurants in '+cn)}" target="_blank" rel="noopener">look for ideas</a>.</li>`;
   const p=party();
-  $('stayTitle').textContent='Places to stay near '+c[0];
+  $('stayTitle').textContent=SECS.stay[2]+c[0];
   $('staySub').textContent=`Searches are set up for ${p.adults} adults and 3 kids. A big vacation rental can keep everyone under one roof.`;
   const q=encodeURIComponent(cn);
   $('stayLinks').innerHTML=`<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/travel/hotels?q=${encodeURIComponent('family hotels with pool near '+cn)}">Hotels with pools</a>
    <a class="btn" target="_blank" rel="noopener" href="https://www.vrbo.com/search?destination=${q}&adults=${p.adults+3}">Vrbo rentals</a>
    <a class="btn" target="_blank" rel="noopener" href="https://www.airbnb.com/s/${q}/homes?adults=${p.adults}&children=3">Airbnb rentals</a>`;
-  $('stays').innerHTML=(LODGE[cn]||[]).map(a=>itemHTML(a,cn,'','stay')).join('');
-  $('stays').hidden=!(LODGE[cn]||[]).length;
+  const cs=customsFor(cn,'stay');
+  $('stays').innerHTML=(LODGE[cn]||[]).map(a=>itemHTML(a,cn,'')).join('')+cs.map(([i,v])=>customHTML(i,v,cn)).join('');
+  $('stays').hidden=!((LODGE[cn]||[]).length+cs.length);
+  Object.keys(SECS).forEach(renderSuggest);
 }
 function renderPicks(){
   const cn=city[6],list=Object.entries(picks).filter(([k,v])=>v.c===cn);
   $('picksTitle').textContent='Our picks for '+city[0];
   document.querySelectorAll('.who button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.fam===fam?'true':'false'));
-  $('pickList').innerHTML=list.length?list.map(([k,v])=>`<li><a href="${gq(v.n,cn)}" target="_blank" rel="noopener">${esc(v.n)}</a><span class="where">${esc(v.w)}</span><span class="fams">${v.f.map(f=>`<span class="fam f${f}">${f}</span>`).join('')}</span></li>`).join('')
+  $('pickList').innerHTML=list.length?list.map(([k,v])=>`<li><a href="${gq(v.n,cn)}" target="_blank" rel="noopener">${esc(v.n)}</a><span class="where">${esc(v.w)}</span><span class="fams">${v.f.map(f=>`<span class="fam f${esc(f)}">${esc(f)}</span>`).join('')}</span></li>`).join('')
     :'<li class="empty">No picks for this city yet.</li>';
   const ma=$('mapPicks');
   if(list.length){
@@ -451,13 +549,14 @@ function renderPicks(){
     ma.href=stops.length===1?gq(list[0][1].n,cn):'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(stops[0])+'&destination='+encodeURIComponent(stops[stops.length-1])+(stops.length>2?'&waypoints='+encodeURIComponent(stops.slice(1,-1).join('|')):'')+'&travelmode=driving';
     ma.removeAttribute('aria-disabled');ma.classList.remove('off');
   }else{ma.removeAttribute('href');ma.setAttribute('aria-disabled','true');ma.classList.add('off');}
-  $('sharePicks').disabled=!Object.keys(picks).length;
+  $('sharePicks').disabled=!(Object.keys(picks).length+Object.keys(customs).length+Object.keys(places).length);
+  $('copySuggest').disabled=!(Object.keys(customs).length+Object.keys(places).length);
   chipLabels();
 }
 function renderCost(){
-  const {mi,tx}=originTexts(),c=city,T=[c[1],c[2]],p=party(),ap=AIRPORTS[c[6]];
+  const {mi,tx}=originTexts(),c=city,T=[c[1],c[2]],p=party(),ap=AIRPORTS[c[6]],dest=ap?ap[0]:c[0];
   $('costTitle').textContent='Rough trip cost to '+c[0];
-  $('fareMiLabel').textContent=mi.ap[0]+' to '+ap[0];$('fareTxLabel').textContent=tx.ap[0]+' to '+ap[0];
+  $('fareMiLabel').textContent=mi.ap[0]+' to '+dest;$('fareTxLabel').textContent=tx.ap[0]+' to '+dest;
   const fk=c[6]+'|'+mi.ap[0],fk2=c[6]+'|'+tx.ap[0];
   $('fareMi').value=fares[fk]??'';$('fareTx').value=fares[fk2]??'';
   const road=o=>dist(o.ll,T)*1.2*2;
@@ -467,31 +566,116 @@ function renderCost(){
   const row=(name,col,o,cars,k,n)=>{const g=gas(o,cars),f=fly(k,n);
     return `<div class="cost-card" style="--c:${col}"><div class="from">${name}, ${n} people</div>
      <div class="cost-line"><span>Drive \u2248${Math.round(road(o)).toLocaleString()} mi round trip, ${cars} car${cars>1?'s':''}</span><strong>${money(g)} gas</strong></div>
-     <div class="cost-line"><span>Fly ${o.ap[0]} to ${ap[0]}</span><strong>${f==null?'Enter a fare':money(f)}</strong></div></div>`;};
+     <div class="cost-line"><span>Fly ${o.ap[0]} to ${esc(dest)}</span><strong>${f==null?'Enter a fare':money(f)}</strong></div></div>`;};
   $('costGrid').innerHTML=row('Brew & Kirk','var(--mi)',mi,S.carsMi,fk,p.mi)+row('Aber','var(--tx)',tx,S.carsTx,fk2,p.tx)
    +`<div class="cost-card" style="--c:var(--line-ink)"><div class="from">Lodging for everyone</div><div class="cost-line"><span>${S.rooms} room${S.rooms>1?'s':''} \u00d7 ${S.nights} night${S.nights==1?'':'s'} at ${money(S.rate)}</span><strong>${money(lodging)}</strong></div></div>`;
 }
-function select(i){cur=i;city=P.cities[i];
-  dots.selectAll('.dot').attr('r',5).attr('fill','var(--ink)');dots.select('.dot'+i).attr('r',8).attr('fill','var(--line-ink)');
+function select(i){if(!CITIES[i])i=0;city=CITIES[i];
+  dots.selectAll('.dot').each(function(){const el=d3.select(this);const ci=CITIES[+this.getAttribute('class').split('dot')[2]];el.attr('r',ci&&isCustom(ci)?8:5).attr('fill',ci&&isCustom(ci)?'var(--land)':'var(--ink)');});
+  dots.select('.dot'+i).attr('r',isCustom(city)?10:8).attr('fill',isCustom(city)?'var(--custom-soft)':'var(--line-ink)');
   [...chipsEl.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i?'true':'false'));
   renderPanel();renderLists();renderPicks();renderCost();
 }
-document.querySelectorAll('.toggle button').forEach(b=>b.onclick=()=>drawPair(b.dataset.pair));
+const rerender=()=>{if(city){renderLists();renderPicks();}};
+
+/* ---------- storage: live (Firebase) or this device ---------- */
+let LIVE=false,code=store.get('bak-code',''),db=null,unsubs=[];
+const FBV='10.14.1';
+const colOf=name=>db.collection('halfway').doc(code).collection(name);
+function persistLocal(){store.set('bak-picks',picks);store.set('bak-custom',customs);store.set('bak-places',places);}
+function writePick(c,n,w,fam,on){
+  if(!LIVE)return;
+  const ref=colOf('picks').doc(encodeURIComponent(c+'|'+n)),FV=firebase.firestore.FieldValue;
+  const p=on?ref.set({c,n,w:w||'',f:FV.arrayUnion(fam)},{merge:true}):ref.update({f:FV.arrayRemove(fam)});
+  p.catch(e=>{if(e&&e.code==='permission-denied')showCode('That code no longer works. Enter the current family code.');else if(!(e&&e.code==='not-found'))syncErr();});
+}
+function saveCustom(id,v){customs[id]=v;persistLocal();rerender();if(LIVE)colOf('custom').doc(id).set(v).catch(saveErr);}
+function removeCustom(id){delete customs[id];persistLocal();rerender();if(LIVE)colOf('custom').doc(id).delete().catch(saveErr);}
+function savePlace(id,v){places[id]=v;persistLocal();drawPair(pairKey,v.name+', '+v.st);if(LIVE)colOf('places').doc(id).set(v).catch(saveErr);}
+function removePlace(id){delete places[id];persistLocal();drawPair(pairKey,null);if(LIVE)colOf('places').doc(id).delete().catch(saveErr);}
+function saveErr(e){if(e&&e.code==='permission-denied')setLive('The family list rejected that change. If you just updated the app, make sure the new security rules are published in Firebase (see SETUP.md).');else syncErr();}
+
+/* ---------- star, family, filters ---------- */
+document.querySelectorAll('.toggle button').forEach(b=>b.onclick=()=>drawPair(b.dataset.pair,null,true));
 ['miFrom','txFrom'].forEach(id=>$(id).onchange=()=>{renderPanel();renderCost();});
 $('adultKid').checked=!!store.get('bak-19',false);
 $('adultKid').onchange=()=>{store.set('bak-19',$('adultKid').checked);setParty();renderLists();renderCost();};
 document.querySelectorAll('.who button').forEach(b=>b.onclick=()=>{fam=b.dataset.fam;store.set('bak-fam',fam);$('whoErr').hidden=true;renderPicks();});
 document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{const f=b.dataset.f;filters.has(f)?filters.delete(f):filters.add(f);b.setAttribute('aria-pressed',filters.has(f));renderLists();});
-document.addEventListener('click',e=>{const s=e.target.closest('.star');if(!s)return;
-  if(!fam){$('whoErr').hidden=false;$('whoErr').scrollIntoView({behavior:'smooth',block:'center'});return;}
-  const id=s.dataset.id,cur=picks[id],on=!(cur&&cur.f.includes(fam));
-  if(cur&&cur.f.includes(fam)){cur.f=cur.f.filter(x=>x!==fam);if(!cur.f.length)delete picks[id];}
-  else if(cur){cur.f.push(fam);}
-  else picks[id]={c:city[6],n:s.dataset.n,w:s.dataset.w,f:[fam]};
-  store.set('bak-picks',picks);renderLists();renderPicks();
-  if(LIVE)writePick(city[6],s.dataset.n,s.dataset.w,fam,on);});
+function needFam(errEl){if(fam)return true;errEl.hidden=false;errEl.textContent='Choose your family in Our picks first (Brew, Aber or Kirk).';return false;}
+document.addEventListener('click',e=>{
+  const s=e.target.closest('.star');
+  if(s){
+    if(!fam){$('whoErr').hidden=false;if($('whoErr').scrollIntoView)$('whoErr').scrollIntoView({behavior:'smooth',block:'center'});return;}
+    const id=s.dataset.id,cur=picks[id],on=!(cur&&cur.f.includes(fam));
+    if(!on){cur.f=cur.f.filter(x=>x!==fam);if(!cur.f.length)delete picks[id];}
+    else if(cur){cur.f.push(fam);}
+    else picks[id]={c:city[6],n:s.dataset.n,w:s.dataset.w,f:[fam]};
+    persistLocal();rerender();writePick(city[6],s.dataset.n,s.dataset.w,fam,on);return;}
+  const o=e.target.closest('[data-open]');
+  if(o){openForms.add(o.dataset.open);renderSuggest(o.dataset.open);const f=$('sn-'+o.dataset.open);if(f)f.focus();return;}
+  const cc=e.target.closest('[data-cancel]');
+  if(cc){openForms.delete(cc.dataset.cancel);renderSuggest(cc.dataset.cancel);return;}
+  const sv=e.target.closest('[data-save]');
+  if(sv){const sec=sv.dataset.save,err=$('se-'+sec),n=$('sn-'+sec).value.trim();
+    const u=$('su-'+sec).value.trim();
+    if(u&&!validLink(u)){err.hidden=false;err.textContent='That doesn\u2019t look like a web link. Copy it again from Google Maps, or leave the link blank.';$('su-'+sec).focus();return;}
+    if(!n){err.hidden=false;err.textContent=u?'Enter a name. Short Google links don\u2019t include the place name.':'Enter a name first.';$('sn-'+sec).focus();return;}
+    if(!needFam(err))return;
+    openForms.delete(sec);
+    saveCustom(uid(),{city:city[6],sec,n,w:$('sw-'+sec).value.trim(),d:$('sd-'+sec).value.trim(),u,by:fam,ts:Date.now()});return;}
+  const rm=e.target.closest('[data-rm]');
+  if(rm){const v=customs[rm.dataset.rm];if(v&&confirm(`Remove "${v.n}" for everyone?`))removeCustom(rm.dataset.rm);return;}
+});
+document.addEventListener('input',e=>{const m=e.target.id&&e.target.id.match(/^s([nwdu])-(\w+)$/);if(!m)return;const er=$('se-'+m[2]);if(er)er.hidden=true;
+  if(m[1]==='u'){const nm=$('sn-'+m[2]);if(nm&&(!nm.value||nm.dataset.auto==='1')){const g=nameFromLink(e.target.value.trim());if(g){nm.value=g.slice(0,120);nm.dataset.auto='1';}}}
+  if(m[1]==='n')e.target.dataset.auto='';});
+document.addEventListener('keydown',e=>{const m=e.key==='Enter'&&e.target.id&&e.target.id.match(/^s[nwdu]-(\w+)$/);if(m){const b=document.querySelector(`[data-save="${m[1]}"]`);if(b)b.click();}});
+
+/* ---------- add a destination ---------- */
+$('addDestBtn').onclick=()=>{const f=$('addDestForm'),open=f.hidden;f.hidden=!open;$('addDestBtn').setAttribute('aria-expanded',open);if(open)$('destQ').focus();};
+$('destQ').oninput=()=>{$('destErr').hidden=true;};
+$('destQ').onkeydown=e=>{if(e.key==='Enter')$('destSearch').click();};
+$('destSearch').onclick=async()=>{
+  const raw=$('destQ').value.trim(),err=$('destErr'),out=$('destResults');out.innerHTML='';
+  if(!raw){err.hidden=false;err.textContent='Enter a city or town.';return;}
+  if(!needFam(err))return;
+  const m=raw.match(/^(.*?)(?:,\s*([A-Za-z .]+))?$/),name=m[1].trim(),st=(m[2]||'').trim().toUpperCase();
+  out.innerHTML='<p class="status">Searching\u2026</p>';
+  try{
+    const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&countryCode=US&name='+encodeURIComponent(name));
+    const d=await r.json();
+    let res=(d.results||[]).filter(x=>x.country_code==='US'&&STATES[x.admin1]);
+    if(st)res=res.filter(x=>STATES[x.admin1]===st||x.admin1.toUpperCase()===st);
+    if(!res.length){out.innerHTML='';err.hidden=false;err.textContent='No US town found with that name. Check the spelling, or add the state like "Branson, MO".';return;}
+    out.innerHTML='<p class="status">Tap the right one to add it:</p>'+res.slice(0,6).map((x,i)=>`<button type="button" class="btn ghost" data-pick="${i}">${esc(x.name)}, ${esc(STATES[x.admin1])}${x.admin2?` <span class="opt">(${esc(x.admin2)})</span>`:''}</button>`).join('');
+    out.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const x=res[+b.dataset.pick];
+      const key=x.name+', '+STATES[x.admin1];
+      if(P.cities.some(c=>c[6]===key)){drawPair(pairKey,key);}
+      else{const ex=Object.entries(places).find(([id,p])=>p.name+', '+p.st===key);
+        if(ex)drawPair(pairKey,key);else savePlace(uid(),{name:x.name,st:STATES[x.admin1],lat:+x.latitude.toFixed(4),lon:+x.longitude.toFixed(4),by:fam,ts:Date.now()});}
+      $('destQ').value='';out.innerHTML='';$('addDestForm').hidden=true;$('addDestBtn').setAttribute('aria-expanded','false');
+      $('panel').scrollIntoView&&$('panel').scrollIntoView({behavior:'smooth',block:'center'});});
+  }catch(e){out.innerHTML='';err.hidden=false;err.textContent='Couldn\u2019t look up places right now. Check your connection and try again. (This works on your GitHub site, not inside Claude.)';}
+};
+
+/* ---------- copy family suggestions for Claude ---------- */
+const SECNAME={in:'Indoor activity',out:'Outdoor activity',eat:'Restaurant',stay:'Place to stay'};
+$('copySuggest').onclick=async()=>{
+  const items=Object.values(customs).filter(v=>v&&v.n),pls=Object.values(places).filter(Boolean);
+  if(!items.length&&!pls.length){$('shareStatus').textContent='No family suggestions or added destinations yet.';return;}
+  const lines=['Family suggestions from the BrewAberKirk Halfway Point App:',''];
+  if(pls.length){lines.push('Added destinations:');pls.forEach(p=>lines.push(`- ${p.name}, ${p.st} (added by ${p.by||'family'})`));lines.push('');}
+  const byCity={};items.forEach(v=>(byCity[v.city]=byCity[v.city]||[]).push(v));
+  Object.keys(byCity).sort().forEach(c=>{lines.push(c+':');byCity[c].forEach(v=>lines.push(`- ${SECNAME[v.sec]||v.sec}: ${v.n}${v.w?' ('+v.w+')':''}${v.d?' \u2014 '+v.d:''}${v.u?' '+v.u:''} [added by ${v.by||'family'}]`));lines.push('');});
+  const text=lines.join('\n').trim();
+  try{await navigator.clipboard.writeText(text);$('shareStatus').textContent='Copied. Paste it into a chat with Claude to have descriptions and tags written.';}
+  catch(e){$('shareStatus').innerHTML='Copy this and paste it into a chat with Claude:<textarea class="copy" rows="6" readonly>'+esc(text)+'</textarea>';}
+};
+
+/* ---------- share link (when not live) ---------- */
 $('sharePicks').onclick=async()=>{
-  const data=Object.entries(picks).map(([k,v])=>[v.c,v.n,v.w,v.f.join('')]);
+  const data={v:2,p:Object.values(picks).map(v=>[v.c,v.n,v.w,v.f.join('')]),i:customs,d:places};
   const enc=btoa(unescape(encodeURIComponent(JSON.stringify(data)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   const url=location.href.split('#')[0]+'#picks='+enc;
   const msg='Here are our picks on the BrewAberKirk Halfway Point App. Open the link to add them to yours.';
@@ -499,48 +683,54 @@ $('sharePicks').onclick=async()=>{
   try{await navigator.clipboard.writeText(url);$('shareStatus').textContent='Link copied. Paste it into a text or email to the family.';}
   catch(e){$('shareStatus').innerHTML='Copy this link and send it to the family: <input class="copy" readonly value="'+esc(url)+'">';}
 };
-['gas','mpg','carsMi','carsTx','nights','rooms','rate'].forEach(k=>{const el=$(k);el.value=S[k];el.oninput=()=>{const v=parseFloat(el.value);if(!isNaN(v)&&v>=0){S[k]=v;store.set('bak-settings',S);renderCost();}};});
-[['fareMi','mi'],['fareTx','tx']].forEach(([id,w])=>$(id).oninput=()=>{const o=ORIG[$(w==='mi'?'miFrom':'txFrom').value];const k=city[6]+'|'+o.ap[0];const v=parseFloat($(id).value);if(isNaN(v))delete fares[k];else fares[k]=v;store.set('bak-fares',fares);renderCost();});
 function importHash(){const m=location.hash.match(/picks=([A-Za-z0-9_-]+)/);if(!m)return;
-  try{const s=m[1].replace(/-/g,'+').replace(/_/g,'/');const data=JSON.parse(decodeURIComponent(escape(atob(s+'==='.slice((s.length+3)%4)))));let n=0;
-    data.forEach(([c,nm,w,f])=>{const id=pid(c,nm);const fs=(f.match(/Brew|Aber|Kirk/g)||[]);if(!picks[id]){picks[id]={c,n:nm,w,f:[]};}fs.forEach(x=>{if(!picks[id].f.includes(x)){picks[id].f.push(x);n++;}});});
-    store.set('bak-picks',picks);history.replaceState(null,'',location.href.split('#')[0]);
-    $('shareStatus').textContent=n?`Added ${n} pick${n>1?'s':''} from the shared link.`:'Those picks were already here.';
+  try{const s=m[1].replace(/-/g,'+').replace(/_/g,'/');let data=JSON.parse(decodeURIComponent(escape(atob(s+'==='.slice((s.length+3)%4)))));
+    if(Array.isArray(data))data={p:data,i:{},d:{}};let n=0;
+    (data.p||[]).forEach(([c,nm,w,f])=>{const id=pid(c,nm);const fs=((f||'').match(/Brew|Aber|Kirk/g)||[]);if(!picks[id])picks[id]={c,n:nm,w,f:[]};fs.forEach(x=>{if(!picks[id].f.includes(x)){picks[id].f.push(x);n++;}});if(!picks[id].f.length)delete picks[id];});
+    Object.entries(data.i||{}).forEach(([id,v])=>{if(!customs[id]&&v&&v.n){customs[id]=v;n++;}});
+    Object.entries(data.d||{}).forEach(([id,v])=>{if(!places[id]&&v&&typeof v.lat==='number'){places[id]=v;n++;}});
+    persistLocal();history.replaceState(null,'',location.href.split('#')[0]);
+    $('shareStatus').textContent=n?`Added ${n} item${n>1?'s':''} from the shared link.`:'Everything in that link was already here.';
   }catch(e){$('shareStatus').textContent='That shared link could not be read. Ask for a fresh one.';}}
 
-let LIVE=false,code=store.get('bak-code',''),db=null,unsub=null;
-const FBV='10.14.1';
+/* ---------- live family list ---------- */
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
 function stamp(){return new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
-const col=c=>db.collection('halfway').doc(c).collection('picks');
-const docId=id=>encodeURIComponent(id);
 function setLive(msg){$('liveStatus').hidden=false;$('liveStatus').textContent=msg;}
-function gotData(d,pending){picks=d;store.set('bak-picks',picks);
-  setLive(pending?'Saving\u2026':'Live: the whole family sees the same picks. Last update '+stamp()+'.');
-  if(city){renderLists();renderPicks();}}
 function syncErr(){setLive('Can\u2019t reach the family list right now. Changes on this device will sync when you\u2019re back online.');}
-function showCode(msg){LIVE=false;$('syncBox').hidden=false;$('liveStatus').hidden=true;$('codeErr').hidden=!msg;$('codeErr').textContent=msg||'';$('sharePicks').hidden=false;}
-function writePick(c,n,w,fam,on){
-  const ref=col(code).doc(docId(c+'|'+n)),FV=firebase.firestore.FieldValue;
-  const p=on?ref.set({c,n,w:w||'',f:FV.arrayUnion(fam)},{merge:true}):ref.update({f:FV.arrayRemove(fam)});
-  p.catch(e=>{if(e&&e.code==='permission-denied')showCode('That code no longer works. Enter the current family code.');else if(!(e&&e.code==='not-found'))syncErr();});
-}
+function showCode(msg){LIVE=false;unsubs.forEach(u=>u());unsubs=[];$('syncBox').hidden=false;$('liveStatus').hidden=true;$('codeErr').hidden=!msg;$('codeErr').textContent=msg||'';$('sharePicks').hidden=false;}
 function connect(c,fromBtn){
-  if(unsub){unsub();unsub=null;}
+  unsubs.forEach(u=>u());unsubs=[];
+  const prevCode=code;code=c;
   let first=true;
-  unsub=col(c).onSnapshot({includeMetadataChanges:true},snap=>{
+  const u1=db.collection('halfway').doc(c).collection('picks').onSnapshot({includeMetadataChanges:true},snap=>{
     const d={};snap.forEach(doc=>{const v=doc.data();if(v&&Array.isArray(v.f)&&v.f.length)d[v.c+'|'+v.n]={c:v.c,n:v.n,w:v.w||'',f:v.f.slice()};});
-    if(first){if(snap.metadata.fromCache)return;first=false;code=c;store.set('bak-code',c);LIVE=true;$('syncBox').hidden=true;$('sharePicks').hidden=true;$('famCode').value='';
+    if(first){if(snap.metadata.fromCache)return;first=false;store.set('bak-code',c);LIVE=true;$('syncBox').hidden=true;$('sharePicks').hidden=true;$('famCode').value='';
       const local=store.get('bak-picks',{});
-      Object.values(local).forEach(v=>{const s=d[v.c+'|'+v.n];(v.f||[]).filter(f=>!s||!s.f.includes(f)).forEach(f=>writePick(v.c,v.n,v.w,f,true));});}
-    gotData(d,snap.metadata.hasPendingWrites);
-  },err=>{unsub=null;if(err&&err.code==='permission-denied')showCode(fromBtn||code?'That code didn\u2019t work. Check it and try again.':'');else syncErr();});
+      Object.values(local).forEach(v=>{const s=d[v.c+'|'+v.n];(v.f||[]).filter(f=>!s||!s.f.includes(f)).forEach(f=>writePick(v.c,v.n,v.w,f,true));});
+      subscribeExtras();}
+    picks=d;persistLocal();
+    setLive(snap.metadata.hasPendingWrites?'Saving\u2026':'Live: the whole family sees the same picks and suggestions. Last update '+stamp()+'.');
+    rerender();
+  },err=>{if(err&&err.code==='permission-denied'){code=prevCode&&!fromBtn?prevCode:code;showCode(fromBtn||prevCode?'That code didn\u2019t work. Check it and try again.':'');}else syncErr();});
+  unsubs.push(u1);
+}
+function subscribeExtras(){
+  const localC=store.get('bak-custom',{}),localP=store.get('bak-places',{});
+  let firstC=true,firstP=true;
+  unsubs.push(colOf('custom').onSnapshot(snap=>{const d={};snap.forEach(doc=>{d[doc.id]=doc.data();});
+    if(firstC){firstC=false;Object.entries(localC).forEach(([id,v])=>{if(!d[id]){d[id]=v;colOf('custom').doc(id).set(v).catch(saveErr);}});}
+    customs=d;persistLocal();rerender();},err=>saveErr(err)));
+  unsubs.push(colOf('places').onSnapshot(snap=>{const d={};snap.forEach(doc=>{d[doc.id]=doc.data();});
+    if(firstP){firstP=false;Object.entries(localP).forEach(([id,v])=>{if(!d[id]){d[id]=v;colOf('places').doc(id).set(v).catch(saveErr);}});}
+    const changed=JSON.stringify(Object.keys(d).sort())!==JSON.stringify(Object.keys(places).sort());
+    places=d;persistLocal();if(changed)drawPair(pairKey,city?city[6]:null);},err=>saveErr(err)));
 }
 async function initSync(){
   if(location.protocol==='file:')return;
   try{await loadScript('firebase-config.js');}catch(e){return;}
   const cfg=window.BAK_FIREBASE_CONFIG;
-  if(!cfg||!cfg.apiKey||/PASTE/i.test(cfg.apiKey)){$('syncBox').hidden=true;setLive('The live family list isn\u2019t set up yet. Add your Firebase settings to firebase-config.js (see SETUP.md).');return;}
+  if(!cfg||!cfg.apiKey||/PASTE/i.test(cfg.apiKey)){setLive('The live family list isn\u2019t set up yet. Add your Firebase settings to firebase-config.js (see SETUP.md).');return;}
   try{await loadScript(`https://www.gstatic.com/firebasejs/${FBV}/firebase-app-compat.js`);await loadScript(`https://www.gstatic.com/firebasejs/${FBV}/firebase-firestore-compat.js`);}
   catch(e){syncErr();return;}
   try{firebase.initializeApp(cfg);db=firebase.firestore();}catch(e){setLive('The Firebase settings in firebase-config.js look wrong. Copy them again from the Firebase console.');return;}
@@ -553,7 +743,12 @@ $('famCodeBtn').onclick=()=>{const v=$('famCode').value.trim();
   connect(v,true);};
 $('famCode').oninput=()=>{$('codeErr').hidden=true;};
 $('famCode').onkeydown=e=>{if(e.key==='Enter')$('famCodeBtn').click();};
-importHash();setParty();drawPair('drive');initSync();
+
+/* ---------- cost inputs ---------- */
+['gas','mpg','carsMi','carsTx','nights','rooms','rate'].forEach(k=>{const el=$(k);el.value=S[k];el.oninput=()=>{const v=parseFloat(el.value);if(!isNaN(v)&&v>=0){S[k]=v;store.set('bak-settings',S);renderCost();}};});
+[['fareMi','mi'],['fareTx','tx']].forEach(([id,w])=>$(id).oninput=()=>{const o=ORIG[$(w==='mi'?'miFrom':'txFrom').value];const k=city[6]+'|'+o.ap[0];const v=parseFloat($(id).value);if(isNaN(v))delete fares[k];else fares[k]=v;store.set('bak-fares',fares);renderCost();});
+
+importHash();setParty();drawPair('drive',null,true);initSync();
 })();
 </script>
 </body>
