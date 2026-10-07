@@ -192,6 +192,16 @@ select,input[type=number]{font:inherit;font-size:16px;color:var(--ink);backgroun
 .custom-note{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center;padding:10px 12px;border:2px dashed var(--custom);border-radius:10px;font-size:14px;color:var(--custom);font-weight:600}
 .hint{margin:-2px 0 4px;font-size:13px;color:var(--muted)}
 textarea.copy{font:inherit;font-size:14px}
+.btn.small{font-size:14px;padding:6px 12px;border-width:1px}
+.btn.danger{border-color:#B3261E;color:#B3261E}
+.inline-fams{display:inline-flex;gap:6px;margin-left:6px;vertical-align:middle}
+.manage h3{font-size:16px;font-weight:800;margin:16px 0 6px}
+.manage-city{font-weight:600;color:var(--muted);margin:10px 0 2px;font-size:14px}
+.manage-list{list-style:none;margin:0;padding:0}
+.manage-list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;margin:6px 0;border:2px dashed var(--custom);border-radius:10px;background:var(--custom-soft)}
+.manage-list li>span{display:flex;flex-direction:column;min-width:0}
+.manage-list .where{font-size:13px;color:var(--muted)}
+.empty-note{color:var(--muted);font-size:15px}
 </style>
 </head>
 <body>
@@ -325,6 +335,11 @@ textarea.copy{font:inherit;font-size:14px}
         <label>Nightly rate per room<span class="money"><span>$</span><input type="number" step="1" min="0" id="rate"></span></label>
       </div>
     </details>
+  </section>
+  <section class="acts manage" aria-labelledby="manageTitle">
+    <h2 id="manageTitle">Family additions</h2>
+    <p class="actsSub">Every destination and suggestion the family has added, across all cities. Removing something removes it for everyone.</p>
+    <div id="manageList"></div>
   </section>
 </main>
 <script>// https://d3js.org v7.9.0 Copyright 2010-2023 Mike Bostock
@@ -574,9 +589,9 @@ function select(i){if(!CITIES[i])i=0;city=CITIES[i];
   dots.selectAll('.dot').each(function(){const el=d3.select(this);const ci=CITIES[+this.getAttribute('class').split('dot')[2]];el.attr('r',ci&&isCustom(ci)?8:5).attr('fill',ci&&isCustom(ci)?'var(--land)':'var(--ink)');});
   dots.select('.dot'+i).attr('r',isCustom(city)?10:8).attr('fill',isCustom(city)?'var(--custom-soft)':'var(--line-ink)');
   [...chipsEl.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i?'true':'false'));
-  renderPanel();renderLists();renderPicks();renderCost();
+  renderPanel();renderLists();renderPicks();renderCost();renderManage();
 }
-const rerender=()=>{if(city){renderLists();renderPicks();}};
+const rerender=()=>{if(city){renderLists();renderPicks();renderManage();}};
 
 /* ---------- storage: live (Firebase) or this device ---------- */
 let LIVE=false,code=store.get('bak-code',''),db=null,unsubs=[];
@@ -602,7 +617,7 @@ $('adultKid').checked=!!store.get('bak-19',false);
 $('adultKid').onchange=()=>{store.set('bak-19',$('adultKid').checked);setParty();renderLists();renderCost();};
 document.querySelectorAll('.who button').forEach(b=>b.onclick=()=>{fam=b.dataset.fam;store.set('bak-fam',fam);$('whoErr').hidden=true;renderPicks();});
 document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{const f=b.dataset.f;filters.has(f)?filters.delete(f):filters.add(f);b.setAttribute('aria-pressed',filters.has(f));renderLists();});
-function needFam(errEl){if(fam)return true;errEl.hidden=false;errEl.textContent='Choose your family in Our picks first (Brew, Aber or Kirk).';return false;}
+function needFam(errEl,retry){if(fam)return true;errEl.hidden=false;errEl.innerHTML=famButtons('Which family is adding this?',retry);return false;}
 document.addEventListener('click',e=>{
   const s=e.target.closest('.star');
   if(s){
@@ -621,7 +636,7 @@ document.addEventListener('click',e=>{
     const u=$('su-'+sec).value.trim();
     if(u&&!validLink(u)){err.hidden=false;err.textContent='That doesn\u2019t look like a web link. Copy it again from Google Maps, or leave the link blank.';$('su-'+sec).focus();return;}
     if(!n){err.hidden=false;err.textContent=u?'Enter a name. Short Google links don\u2019t include the place name.':'Enter a name first.';$('sn-'+sec).focus();return;}
-    if(!needFam(err))return;
+    if(!needFam(err,sec))return;
     openForms.delete(sec);
     saveCustom(uid(),{city:city[6],sec,n,w:$('sw-'+sec).value.trim(),d:$('sd-'+sec).value.trim(),u,by:fam,ts:Date.now()});return;}
   const rm=e.target.closest('[data-rm]');
@@ -636,28 +651,78 @@ document.addEventListener('keydown',e=>{const m=e.key==='Enter'&&e.target.id&&e.
 $('addDestBtn').onclick=()=>{const f=$('addDestForm'),open=f.hidden;f.hidden=!open;$('addDestBtn').setAttribute('aria-expanded',open);if(open)$('destQ').focus();};
 $('destQ').oninput=()=>{$('destErr').hidden=true;};
 $('destQ').onkeydown=e=>{if(e.key==='Enter')$('destSearch').click();};
+const ABBR=new Set(Object.values(STATES));
+const stateOf=t=>{if(!t)return '';t=t.trim().replace(/\.$/,'');const u=t.toUpperCase();if(ABBR.has(u))return u;const k=Object.keys(STATES).find(s=>s.toLowerCase()===t.toLowerCase());return k?STATES[k]:'';};
+function parseDest(raw){
+  let name=raw.trim(),st='';
+  const parts=name.split(',');
+  if(parts.length>1){name=parts[0].trim();st=stateOf(parts.slice(1).join(',').replace(/\b(usa|us|united states)\b/ig,'').replace(/,/g,' ').trim());}
+  else{const m=name.match(/^(.+?)\s+([A-Za-z]{2})$/);if(m&&ABBR.has(m[2].toUpperCase())){name=m[1].trim();st=m[2].toUpperCase();}}
+  return{name,st};
+}
+async function geoOpenMeteo(name){
+  const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=20&language=en&format=json&countryCode=US&name='+encodeURIComponent(name));
+  if(!r.ok)throw new Error('om '+r.status);
+  const d=await r.json();
+  return (d.results||[]).filter(x=>x.country_code==='US'&&STATES[x.admin1]).map(x=>({name:x.name,st:STATES[x.admin1],lat:x.latitude,lon:x.longitude,extra:x.admin2||''}));
+}
+async function geoNominatim(name,st){
+  const q=name+(st?', '+st:'');
+  const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=10&countrycodes=us&q='+encodeURIComponent(q),{headers:{'Accept':'application/json'}});
+  if(!r.ok)throw new Error('nm '+r.status);
+  const d=await r.json();
+  return d.map(x=>{const a=x.address||{};const nm=a.city||a.town||a.village||a.hamlet||a.municipality||x.name;const s=STATES[a.state];
+    return nm&&s?{name:nm,st:s,lat:+x.lat,lon:+x.lon,extra:a.county||''}:null;}).filter(Boolean);
+}
+function famButtons(msg,retry){
+  return `${msg} <span class="inline-fams">${['Brew','Aber','Kirk'].map(f=>`<button type="button" class="btn small" data-setfam="${f}" data-retry="${retry}">${f}</button>`).join('')}</span>`;
+}
+let destRes=[];
 $('destSearch').onclick=async()=>{
-  const raw=$('destQ').value.trim(),err=$('destErr'),out=$('destResults');out.innerHTML='';
-  if(!raw){err.hidden=false;err.textContent='Enter a city or town.';return;}
-  if(!needFam(err))return;
-  const m=raw.match(/^(.*?)(?:,\s*([A-Za-z .]+))?$/),name=m[1].trim(),st=(m[2]||'').trim().toUpperCase();
-  out.innerHTML='<p class="status">Searching\u2026</p>';
-  try{
-    const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?count=10&language=en&format=json&countryCode=US&name='+encodeURIComponent(name));
-    const d=await r.json();
-    let res=(d.results||[]).filter(x=>x.country_code==='US'&&STATES[x.admin1]);
-    if(st)res=res.filter(x=>STATES[x.admin1]===st||x.admin1.toUpperCase()===st);
-    if(!res.length){out.innerHTML='';err.hidden=false;err.textContent='No US town found with that name. Check the spelling, or add the state like "Branson, MO".';return;}
-    out.innerHTML='<p class="status">Tap the right one to add it:</p>'+res.slice(0,6).map((x,i)=>`<button type="button" class="btn ghost" data-pick="${i}">${esc(x.name)}, ${esc(STATES[x.admin1])}${x.admin2?` <span class="opt">(${esc(x.admin2)})</span>`:''}</button>`).join('');
-    out.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{const x=res[+b.dataset.pick];
-      const key=x.name+', '+STATES[x.admin1];
-      if(P.cities.some(c=>c[6]===key)){drawPair(pairKey,key);}
-      else{const ex=Object.entries(places).find(([id,p])=>p.name+', '+p.st===key);
-        if(ex)drawPair(pairKey,key);else savePlace(uid(),{name:x.name,st:STATES[x.admin1],lat:+x.latitude.toFixed(4),lon:+x.longitude.toFixed(4),by:fam,ts:Date.now()});}
-      $('destQ').value='';out.innerHTML='';$('addDestForm').hidden=true;$('addDestBtn').setAttribute('aria-expanded','false');
-      $('panel').scrollIntoView&&$('panel').scrollIntoView({behavior:'smooth',block:'center'});});
-  }catch(e){out.innerHTML='';err.hidden=false;err.textContent='Couldn\u2019t look up places right now. Check your connection and try again. (This works on your GitHub site, not inside Claude.)';}
+  const raw=$('destQ').value.trim(),err=$('destErr'),out=$('destResults');out.innerHTML='';err.hidden=true;
+  if(!raw){err.hidden=false;err.textContent='Enter a city or town, like Branson, MO.';return;}
+  if(!fam){err.hidden=false;err.innerHTML=famButtons('Which family is adding this?','dest');return;}
+  const {name,st}=parseDest(raw);
+  out.innerHTML='<p class="status">Searching\u2026</p>';$('destSearch').disabled=true;
+  let res=[],failed=0;
+  try{res=await geoOpenMeteo(name);}catch(e){failed++;}
+  if(st)res=res.filter(x=>x.st===st);
+  if(!res.length){try{res=await geoNominatim(name,st);if(st)res=res.filter(x=>x.st===st);}catch(e){failed++;}}
+  $('destSearch').disabled=false;
+  const seen=new Set();res=res.filter(x=>{const k=x.name+'|'+x.st;if(seen.has(k))return false;seen.add(k);return true;});
+  if(!res.length){out.innerHTML='';err.hidden=false;
+    err.textContent=failed>=2?'Couldn\u2019t reach the place lookup. Check your connection and try again. (Adding destinations works on your GitHub site, not inside Claude.)'
+      :`No US town found for "${raw}". Check the spelling, or try the town name with its state, like Branson, MO.`;return;}
+  destRes=res.slice(0,6);
+  out.innerHTML='<p class="status">Tap the right one to add it:</p>'+destRes.map((x,i)=>`<button type="button" class="btn ghost" data-pick="${i}">${esc(x.name)}, ${esc(x.st)}${x.extra?` <span class="opt">(${esc(x.extra)})</span>`:''}</button>`).join('');
 };
+$('destResults').addEventListener('click',e=>{const b=e.target.closest('[data-pick]');if(!b)return;const x=destRes[+b.dataset.pick];if(!x)return;
+  const key=x.name+', '+x.st;
+  if(P.cities.some(c=>c[6]===key))drawPair(pairKey,key);
+  else{const ex=Object.entries(places).find(([id,p])=>p.name+', '+p.st===key);
+    if(ex)drawPair(pairKey,key);else savePlace(uid(),{name:x.name.slice(0,80),st:x.st,lat:+(+x.lat).toFixed(4),lon:+(+x.lon).toFixed(4),by:fam,ts:Date.now()});}
+  $('destQ').value='';$('destResults').innerHTML='';$('addDestForm').hidden=true;$('addDestBtn').setAttribute('aria-expanded','false');
+  if($('panel').scrollIntoView)$('panel').scrollIntoView({behavior:'smooth',block:'center'});});
+
+/* ---------- family additions: review and remove ---------- */
+const SECLABEL={in:'Indoor activity',out:'Outdoor activity',eat:'Restaurant',stay:'Place to stay'};
+function renderManage(){
+  const pl=Object.entries(places).filter(([i,v])=>v),cu=Object.entries(customs).filter(([i,v])=>v&&v.n);
+  if(!pl.length&&!cu.length){$('manageList').innerHTML='<p class="empty-note">Nothing added yet. Destinations and suggestions the family adds will be listed here.</p>';return;}
+  let h='';
+  if(pl.length)h+='<h3>Destinations</h3><ul class="manage-list">'+pl.sort((a,b)=>a[1].name.localeCompare(b[1].name)).map(([id,v])=>`<li><span><strong>${esc(v.name)}, ${esc(v.st)}</strong><span class="where">Added by ${esc(v.by||'family')}</span></span><button type="button" class="btn small danger" data-rmplace="${esc(id)}">Remove</button></li>`).join('')+'</ul>';
+  if(cu.length){const by={};cu.forEach(([id,v])=>(by[v.city]=by[v.city]||[]).push([id,v]));
+    h+='<h3>Suggestions</h3>'+Object.keys(by).sort().map(c=>`<p class="manage-city">${esc(c)}</p><ul class="manage-list">`+by[c].map(([id,v])=>`<li><span><strong>${esc(v.n)}</strong><span class="where">${esc(SECLABEL[v.sec]||'')} \u00b7 added by ${esc(v.by||'family')}</span></span><button type="button" class="btn small danger" data-rm="${esc(id)}">Remove</button></li>`).join('')+'</ul>').join('');}
+  $('manageList').innerHTML=h;
+}
+document.addEventListener('click',e=>{
+  const sf=e.target.closest('[data-setfam]');
+  if(sf){fam=sf.dataset.setfam;store.set('bak-fam',fam);$('whoErr').hidden=true;renderPicks();
+    const r=sf.dataset.retry;if(r==='dest'){$('destErr').hidden=true;$('destSearch').click();}
+    else{const er=$('se-'+r);if(er)er.hidden=true;const b=document.querySelector(`[data-save="${r}"]`);if(b)b.click();}return;}
+  const rp=e.target.closest('[data-rmplace]');
+  if(rp){const v=places[rp.dataset.rmplace];if(v&&confirm(`Remove ${v.name}, ${v.st} from the map for everyone? Suggestions added for it stay in the list below.`))removePlace(rp.dataset.rmplace);return;}
+});
 
 /* ---------- copy family suggestions for Claude ---------- */
 const SECNAME={in:'Indoor activity',out:'Outdoor activity',eat:'Restaurant',stay:'Place to stay'};
