@@ -1,7 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Replace YOUR-FAMILY-CODE (both places) with the code your family will type in.
+    // Replace YOUR-FAMILY-CODE (all three places) with the code your family types in.
+
+    // Starred picks
     match /halfway/{code}/picks/{pickId} {
       allow read, delete: if code == 'YOUR-FAMILY-CODE';
       allow create, update: if code == 'YOUR-FAMILY-CODE'
@@ -10,6 +12,33 @@ service cloud.firestore {
         && request.resource.data.n is string && request.resource.data.n.size() <= 200
         && request.resource.data.w is string && request.resource.data.w.size() <= 200
         && request.resource.data.f is list && request.resource.data.f.size() <= 3;
+    }
+
+    // Activities, restaurants and places to stay added by the family
+    match /halfway/{code}/custom/{itemId} {
+      allow read, delete: if code == 'YOUR-FAMILY-CODE';
+      allow create, update: if code == 'YOUR-FAMILY-CODE'
+        && request.resource.data.keys().hasOnly(['city', 'sec', 'n', 'w', 'd', 'u', 'by', 'ts'])
+        && request.resource.data.sec in ['in', 'out', 'eat', 'stay']
+        && request.resource.data.by in ['Brew', 'Aber', 'Kirk']
+        && request.resource.data.city is string && request.resource.data.city.size() <= 120
+        && request.resource.data.n is string && request.resource.data.n.size() > 0 && request.resource.data.n.size() <= 120
+        && request.resource.data.w is string && request.resource.data.w.size() <= 80
+        && request.resource.data.d is string && request.resource.data.d.size() <= 200
+        && (!('u' in request.resource.data) || (request.resource.data.u is string && request.resource.data.u.size() <= 500))
+        && request.resource.data.ts is number;
+    }
+
+    // Destinations added to the map by the family
+    match /halfway/{code}/places/{placeId} {
+      allow read, delete: if code == 'YOUR-FAMILY-CODE';
+      allow create, update: if code == 'YOUR-FAMILY-CODE'
+        && request.resource.data.keys().hasOnly(['name', 'st', 'lat', 'lon', 'by', 'ts'])
+        && request.resource.data.by in ['Brew', 'Aber', 'Kirk']
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
+        && request.resource.data.st is string && request.resource.data.st.size() == 2
+        && request.resource.data.lat is number && request.resource.data.lon is number
+        && request.resource.data.ts is number;
     }
   }
 }
