@@ -10,6 +10,11 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.7.2 (October 8, 2026)
+- Added: a short how-to under every section heading explaining what to tap.
+- Added: a Getting there heading above the directions and flight cards
+  (the menu link is renamed to match).
+
 ## 1.7.1 (October 8, 2026)
 - Changed: the trip plan is now a compact calendar. Tap a day to plan it in
   a popup, with arrows to move between days. Day tiles show the first
