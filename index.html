@@ -451,6 +451,21 @@ html.big body{zoom:1.15}
   #printView .pv-sub,#printView .pv-foot{color:#333}
   @page{margin:0.6in}
 }
+.dash-tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin:0 0 12px;overflow-x:auto}
+.dash-tabs [role=tab]{font:inherit;font-size:15px;font-weight:700;padding:10px 14px;min-height:44px;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
+.dash-tabs [role=tab][aria-selected="true"]{color:var(--ink);border-bottom-color:var(--line)}
+.dash-tabs [role=tab]:focus-visible{outline:3px solid var(--line);outline-offset:-3px}
+.dash-h{font-size:16px;font-weight:800;margin:0 0 4px}
+.dash-panel:not(.active){display:none}
+@media (min-width:900px){
+  .dash-tabs{display:none}
+  .dash{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+  .dash-panel,.dash-panel:not(.active){display:block}
+  #tabOverview{grid-column:1/-1}
+  #tabCal,#tabTodo{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--paper)}
+  #tabTodo .todo-add{grid-template-columns:1fr 1fr}
+  #tabTodo .todo-add input{grid-column:1/-1}
+}
 </style>
 </head>
 <body>
@@ -466,7 +481,10 @@ html.big body{zoom:1.15}
   <nav class="side-nav" id="sideNav" aria-label="Page sections" hidden>
     <p class="nav-head">Jump to</p>
     <ul>
-      <li><a href="#summarySec">Trip at a glance</a></li>
+      <li class="nav-group">Our trip</li>
+      <li><a href="#tabOverview">Overview</a></li>
+      <li><a href="#tabCal">Trip calendar</a></li>
+      <li><a href="#tabTodo">To-do list</a></li>
       <li class="nav-group">Step 1: Decide where and when</li>
       <li><a href="#tripTop">Trip type</a></li>
       <li><a href="#mapSec">Map</a></li>
@@ -485,8 +503,6 @@ html.big body{zoom:1.15}
       <li><a href="#gemSec">Hidden gems</a></li>
       <li><a href="#eatSec">Places to eat</a></li>
       <li><a href="#picksSec">Our picks</a></li>
-      <li><a href="#planSec">Trip plan</a></li>
-      <li><a href="#todoSec">To-do list</a></li>
       <li><a href="#manageSec">Family additions</a></li>
     </ul>
     <div class="nav-tools"><button type="button" class="btn small" id="expandAll">Expand all</button><button type="button" class="btn small" id="collapseAll">Collapse all</button></div>
@@ -504,16 +520,41 @@ html.big body{zoom:1.15}
       <li><strong>Pick how we're traveling.</strong> Use the trip toggle: driving (Spring Lake and Andice) or flying (Detroit and Austin).</li>
       <li><strong>Pick a meeting city.</strong> The yellow line shows every spot that's the same distance from both families. Tap a city on the map or the buttons below it, or add your own.</li>
       <li><strong>Say who's traveling and when.</strong> Choose where each family starts and pick travel dates to see the weather.</li>
-      <li><strong>Step 1 decides, Step 2 plans.</strong> First settle the city, dates and budget with the family vote, weather and trip cost. Then plan where to stay, things to do, meals and the day-by-day plan, and share the to-do list.</li>
+      <li><strong>Our trip, then Step 1 and Step 2.</strong> Our trip at the top holds the overview, trip calendar and to-do list. Step 1 settles the city, dates and budget; Step 2 is for exploring places to stay, things to do and food.</li>
       <li><strong>Star favorites and vote.</strong> Tap ☆ on anything you like and vote for your top cities. Everyone sees the family’s picks, votes and plan.</li>
     </ol>
     <p class="hint">Tips: the ☰ button at the top left jumps straight to any section, and the Hide button next to each section title tucks it away until you need it.</p>
     <div class="pick-actions"><button type="button" class="btn primary" id="welcomeClose">Get started</button></div>
   </dialog>
   <section class="setup summary" id="summarySec" aria-labelledby="sumTitle" aria-live="polite">
-    <h2 id="sumTitle">Trip at a glance</h2>
-    <p class="actsSub sec-help">A quick look at where things stand: the leading city from the family vote (or the city you're viewing), the trip dates, typical weather, estimated cost and how much of the plan is filled in. Tap a tile to jump to that section.</p>
-    <div id="sumBody"></div>
+    <h2 id="sumTitle">Our trip</h2>
+    <p class="actsSub sec-help">Your trip dashboard. Overview shows where things stand; tap a tile to jump to that section. In Calendar, tap a day to plan activities, meals and notes. In To-dos, add tasks, choose who's on each one and tick them off when done. On a phone, switch between them with the tabs.</p>
+    <div class="dash-tabs" role="tablist" aria-label="Our trip">
+      <button type="button" role="tab" id="tab-ov" aria-controls="tabOverview" aria-selected="true" data-tab="tabOverview">Overview</button>
+      <button type="button" role="tab" id="tab-cal" aria-controls="tabCal" aria-selected="false" data-tab="tabCal">Calendar</button>
+      <button type="button" role="tab" id="tab-td" aria-controls="tabTodo" aria-selected="false" data-tab="tabTodo">To-dos</button>
+    </div>
+    <div class="dash">
+      <div class="dash-panel active" id="tabOverview" role="tabpanel" aria-labelledby="tab-ov">
+        <div id="sumBody"></div>
+      </div>
+      <div class="dash-panel" id="tabCal" role="tabpanel" aria-labelledby="tab-cal">
+        <h3 class="dash-h" id="planTitle">Trip calendar</h3>
+        <p class="hint" id="planSub"></p>
+    <div class="pick-actions" id="planActions"></div>
+    <div id="planDays" class="plan-cal"></div>
+    <dialog id="dayDlg" aria-labelledby="dayDlgTitle"><div id="dayDlgBody"></div></dialog>
+      </div>
+      <div class="dash-panel" id="tabTodo" role="tabpanel" aria-labelledby="tab-td">
+        <h3 class="dash-h" id="todoTitle">To-do list</h3>
+    <div class="todo-add"><label class="sr" for="todoText">New task</label><input id="todoText" class="txt" maxlength="120" autocomplete="off" placeholder="For example, book the rental">
+      <label class="sr" for="todoWho">Who's on it</label><select id="todoWho" class="txt"><option value="Everyone">Everyone</option><option>Brew</option><option>Aber</option><option>Kirk</option></select>
+      <button type="button" class="btn" id="todoAdd">Add</button></div>
+    <p class="err" id="todoErr" hidden></p>
+    <ul id="todoList" class="todo-list"></ul>
+    <div class="pick-actions"><button type="button" class="btn ghost small" id="todoStarter">Add common tasks</button><button type="button" class="linkbtn" id="todoClearDone">Remove finished tasks</button></div>
+      </div>
+    </div>
   </section>
   <div class="step-div" id="step1"><span class="step-num">Step 1</span><span class="step-name">Decide where and when</span></div>
   <div class="toggle-wrap" id="tripTop">
@@ -703,31 +744,14 @@ html.big body{zoom:1.15}
     </div>
     <p class="status" id="shareStatus" role="status"></p>
   </section>
-  <section class="acts plan" id="planSec" aria-labelledby="planTitle">
-    <h2 id="planTitle">Trip plan</h2>
-    <p class="actsSub sec-help" id="planSub"></p>
-    <div class="pick-actions" id="planActions"></div>
-    <div id="planDays" class="plan-cal"></div>
-    <dialog id="dayDlg" aria-labelledby="dayDlgTitle"><div id="dayDlgBody"></div></dialog>
-  </section>
 
-  <section class="acts" id="todoSec" aria-labelledby="todoTitle" aria-live="polite">
-    <h2 id="todoTitle">To-do list</h2>
-    <p class="actsSub sec-help">Shared booking and planning tasks. Type a task, choose who's on it and tap Add. Tick the box when it's done, change who's on it from the menu next to each task, or tap Add common tasks for a starter list.</p>
-    <div class="todo-add"><label class="sr" for="todoText">New task</label><input id="todoText" class="txt" maxlength="120" autocomplete="off" placeholder="For example, book the rental">
-      <label class="sr" for="todoWho">Who's on it</label><select id="todoWho" class="txt"><option value="Everyone">Everyone</option><option>Brew</option><option>Aber</option><option>Kirk</option></select>
-      <button type="button" class="btn" id="todoAdd">Add</button></div>
-    <p class="err" id="todoErr" hidden></p>
-    <ul id="todoList" class="todo-list"></ul>
-    <div class="pick-actions"><button type="button" class="btn ghost small" id="todoStarter">Add common tasks</button><button type="button" class="linkbtn" id="todoClearDone">Remove finished tasks</button></div>
-  </section>
   <section class="acts manage" id="manageSec" aria-labelledby="manageTitle">
     <h2 id="manageTitle">Family additions</h2>
     <p class="actsSub sec-help">Every destination and suggestion the family has added, across all cities. Tap Remove to delete one for everyone; you’ll be asked to confirm. Download a backup saves all shared family data to a file, just in case.</p>
     <div id="manageList"></div>
     <div class="pick-actions"><button type="button" class="btn small" id="backupBtn2">Download a backup of all family data</button></div>
   </section>
-  <p class="version" id="appVersion">Version 1.10.0 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 1.11.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
@@ -1266,6 +1290,7 @@ scrim.onclick=()=>setNav(false);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!nav.hidden){setNav(false);menuBtn.focus();}});
 nav.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;e.preventDefault();
   const t=document.querySelector(a.getAttribute('href'));setNav(false);
+  if(t&&t.classList.contains('dash-panel')&&typeof activateTab==='function')activateTab(t.id);
   if(t){if(t.scrollIntoView)t.scrollIntoView({behavior:'smooth',block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');try{t.focus({preventScroll:true});}catch(err){}}});
 
 /* ---------- travel dates ---------- */
@@ -1571,7 +1596,7 @@ dayDlg.addEventListener('cancel',e=>{e.preventDefault();closeDay();});
 dayDlg.addEventListener('click',e=>{if(e.target===dayDlg)closeDay();});
 function renderPlan(){
   if(!city)return;const cn=city[6],days=tripDays();
-  $('planTitle').textContent='Trip plan for '+city[0];
+  $('planTitle').textContent='Trip calendar for '+city[0];if(typeof tabCounts==='function')try{tabCounts();}catch(e){}
   if(!days.length){$('planSub').textContent='Choose travel dates first, and a day-by-day plan appears here.';$('planDays').innerHTML='';$('planActions').innerHTML='';return;}
   $('planSub').textContent='Tap a day to plan activities, meals and notes. Travel days are highlighted; the first and last are marked automatically. Each city has its own plan.';
   const n=days.length,set=new Set(days),mode=P&&P.mode==='fly'?'\u2708\ufe0f':'\ud83d\ude97';
@@ -1766,7 +1791,7 @@ function saveTodo(id,v){todos[id]=v;store.set('bak-todos',todos);renderTodos();r
 function delTodo(id){delete todos[id];store.set('bak-todos',todos);renderTodos();renderSummary();if(LIVE)colOf('todos').doc(id).delete().catch(saveErr);}
 function addTodo(t,who){t=String(t).trim().slice(0,120);if(!t)return false;saveTodo(uid(),{t,who:WHO.includes(who)?who:'Everyone',done:false,by:fam||'',ts:Date.now()});return true;}
 function renderTodos(){
-  const box=$('todoList');if(!box)return;
+  const box=$('todoList');if(!box)return;if(typeof tabCounts==='function')try{tabCounts();}catch(e){}
   const list=Object.entries(todos).filter(([i,v])=>v&&v.t).sort((a,b)=>(a[1].done-b[1].done)||(a[1].ts-b[1].ts));
   if(!list.length){box.innerHTML='<li class="empty-note">No tasks yet. Add one above, or tap Add common tasks for a starter list.</li>';return;}
   box.innerHTML=list.map(([id,v])=>`<li class="${v.done?'done':''}"><input type="checkbox" id="td-${esc(id)}" data-tdone="${esc(id)}" ${v.done?'checked':''}><label for="td-${esc(id)}">${esc(v.t)}</label>
@@ -1812,8 +1837,8 @@ function renderSummary(){
     ${tile('#datesSec','Trip dates',trip.start?esc(rangeTxt(trip.start,trip.end||trip.start)):'Not set yet',trip.start?`${days.length} day${days.length===1?'':'s'}`:(nSug?`${nSug} suggestion${nSug>1?'s':''} to answer`:'Suggest some dates'))}
     ${tile('#weatherSec','Typical weather',trip.start?'<span id="sumWx">\u2026</span>':'\u2013',trip.start?`for those dates in ${esc(c[0])}`:'Set dates to see it')}
     ${tile('#costSec','Estimated cost',cost==null?'Enter fares':money(cost),cost==null?'Flights need fares in Trip cost':'Travel and lodging, everyone')}
-    ${tile('#planSec','Trip plan',days.length?`${planned} of ${days.length} days`:'\u2013',days.length?'have something planned':'Set dates to start')}
-    ${tile('#todoSec','To-do list',td.length?`${tdDone} of ${td.length} done`:'No tasks yet',td.length?'':'Add booking tasks')}
+    ${tile('#tabCal','Trip calendar',days.length?`${planned} of ${days.length} days`:'\u2013',days.length?'have something planned':'Set dates to start')}
+    ${tile('#tabTodo','To-do list',td.length?`${tdDone} of ${td.length} done`:'No tasks yet',td.length?'':'Add booking tasks')}
   </div>
   <div class="pick-actions">${sc.lead&&cn!==city[6]?`<button type="button" class="btn small" data-go="${esc(cn)}">Open ${esc(c[0])}</button>`:''}<button type="button" class="btn small" id="printBtn">Print trip summary</button></div>`;
   $('printBtn').onclick=printSummary;
@@ -1822,7 +1847,21 @@ function renderSummary(){
       const el=$('sumWx');if(el)el.textContent=hi.length?`${deg(avg(hi))} / ${deg(avg(lo))}F`:'Not available';})
     .catch(()=>{const el=$('sumWx');if(el&&tok===sumTok)el.textContent='Not available';});}
 }
-document.addEventListener('click',e=>{const t=e.target.closest('[data-jump]');if(!t)return;const el=document.querySelector(t.dataset.jump);if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-jump]');if(!t)return;const el=document.querySelector(t.dataset.jump);if(!el)return;
+  if(el.classList.contains('dash-panel')){activateTab(el.id,true);const sb=$('summarySec');if(sb&&window.matchMedia&&!window.matchMedia('(min-width: 900px)').matches){const tb=document.querySelector('.dash-tabs');if(tb&&tb.scrollIntoView)tb.scrollIntoView({behavior:'smooth',block:'start'});}else if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});});
+/* ---------- Our trip tabs ---------- */
+const TABS=['tabOverview','tabCal','tabTodo'];
+function activateTab(id,focus){if(!TABS.includes(id))id='tabOverview';
+  TABS.forEach(t=>{const p=$(t);if(p)p.classList.toggle('active',t===id);});
+  document.querySelectorAll('.dash-tabs [role=tab]').forEach(b=>{const on=b.dataset.tab===id;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;if(on&&focus&&b.offsetParent)b.focus();});
+  store.set('bak-tab',id);}
+document.querySelectorAll('.dash-tabs [role=tab]').forEach((b,i,all)=>{b.onclick=()=>activateTab(b.dataset.tab);
+  b.onkeydown=e=>{const k={ArrowRight:1,ArrowLeft:-1}[e.key];if(e.key==='Home'||e.key==='End'){e.preventDefault();activateTab(all[e.key==='Home'?0:all.length-1].dataset.tab,true);return;}if(!k)return;e.preventDefault();activateTab(all[(i+k+all.length)%all.length].dataset.tab,true);};});
+activateTab(store.get('bak-tab','tabOverview'));
+function tabCounts(){const td=Object.values(todos).filter(v=>v&&v.t),open=td.filter(v=>!v.done).length;
+  const b=$('tab-td');if(b)b.textContent=td.length?`To-dos (${open})`:'To-dos';
+  const days=typeof tripDays==='function'?tripDays():[];const c=$('tab-cal');if(c)c.textContent=days.length?`Calendar (${days.length} day${days.length>1?'s':''})`:'Calendar';}
 
 /* ---------- print ---------- */
 function printSummary(){

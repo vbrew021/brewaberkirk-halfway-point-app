@@ -78,7 +78,9 @@ from both, with suggested cities near it.
 ## Page order (top to bottom)
 
 Top bar: menu button, app name (links home), "I'm with" family chooser, How
-this works. Then Trip at a glance, followed by two steps.
+this works. Then Our trip, a dashboard with Overview, Trip calendar
+(calendar with day popups) and To-do list (side by side on a computer, tabs
+on a phone), followed by two steps.
 
 **Step 1: Decide where and when.** Trip-type toggle, Map, Choose a meeting
 city (with + Add a destination), Getting there (directions or flight cards
@@ -87,8 +89,8 @@ suggested dates), Weather (with packing hints), Trip cost (with Who pays
 what).
 
 **Step 2: Plan the trip.** Places to stay, Filter things to do, Indoor,
-Outdoor, Hidden gems, Places to eat, Our picks, Trip plan (calendar with day
-popups), To-do list, Family additions, version label.
+Outdoor, Hidden gems, Places to eat, Our picks, Family additions, version
+label.
 
 The menu also holds Expand all, Collapse all, Larger text, Print trip
 summary and Download a backup.

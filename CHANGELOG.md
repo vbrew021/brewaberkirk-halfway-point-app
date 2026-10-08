@@ -10,6 +10,14 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.11.0 (October 8, 2026)
+- Changed: Trip at a glance is now Our trip, a dashboard with the overview,
+  the trip calendar and the to-do list. On a computer all three show at
+  once (calendar and to-dos side by side); on a phone they're tabs, with
+  counts, and each device remembers the last tab.
+- Changed: the trip calendar and to-do list moved out of Step 2 into Our
+  trip. Overview tiles and menu links open the right tab.
+
 ## 1.10.0 (October 8, 2026)
 - Changed: the page is organized into Step 1 (Decide where and when) and
   Step 2 (Plan the trip). Family vote, Trip cost and Places to stay moved

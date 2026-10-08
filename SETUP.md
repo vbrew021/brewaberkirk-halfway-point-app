@@ -103,8 +103,8 @@ weather for those dates in the selected city.
 
 - **Family vote:** open a city, then choose your family's 1st, 2nd or 3rd
   choice in its directions panel. Standings appear in **Family vote**.
-- **Trip plan:** once travel dates are set, each city gets a small calendar of
-  your trip. Tap a day to open it, then add activities, plan breakfast, lunch and dinner, mark travel days and add
+- **Trip calendar:** in **Our trip** at the top, once travel dates are set,
+  each city gets a small calendar of your trip. Tap a day to open it, then add activities, plan breakfast, lunch and dinner, mark travel days and add
   notes. **Add to calendar** downloads a file your calendar app can open.
 
 ## Updating the app later
