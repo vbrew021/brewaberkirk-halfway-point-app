@@ -10,6 +10,19 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.14.2 (October 8, 2026)
+- Changed: Our trip stands out as the main dashboard with a gold stripe
+  along its top edge and a soft shadow; it otherwise matches the other cards.
+
+## 1.14.1 (October 8, 2026)
+- Changed: the 1st/2nd/3rd choice vote buttons moved from Getting there into
+  Family vote, above the standings. They vote for the city you're viewing.
+- Changed: every section now uses the same card style (light background,
+  thin border, rounded corners). The yellow divider lines and the one-off
+  borders are gone, and the filter buttons no longer sit in a shaded box.
+- Fixed: the map title's Hide button stays beside the title instead of
+  dropping below it.
+
 ## 1.14.0 (October 8, 2026)
 - Changed: the whole page is now two independent columns on a computer.
   Left (the map's width): Step 1's trip toggle, map, cities, Getting there

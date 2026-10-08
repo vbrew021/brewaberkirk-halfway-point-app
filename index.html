@@ -496,6 +496,15 @@ html.big body{zoom:1.15}
 .hero-left>.step-div:first-child{margin-top:12px}
 @media (min-width:1000px){.hero-right{padding-top:12px}.hero-right>section:first-child{margin-top:0}.hero-left .list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
 .hero-right>section.picks{margin-top:16px}
+/* consistent section cards */
+main section.coll{margin:16px 0 !important;padding:18px !important;border:1px solid var(--border) !important;border-top:1px solid var(--border) !important;border-radius:14px !important;background:var(--land) !important}
+main section.coll.is-collapsed{padding-bottom:8px !important}
+main section.coll#summarySec{border-top:5px solid var(--line) !important;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.filters{position:static;background:transparent;padding:0;margin:0;border:0;overflow:visible}
+.sec-head{flex-wrap:nowrap}
+.sec-head>h1,.sec-head>h2{min-width:0}
+.vote-ctl{border:0;padding:0;background:transparent;margin:4px 0 6px}
+#voteSec .sub-h{margin-top:14px}
 </style>
 </head>
 <body>
@@ -595,7 +604,7 @@ html.big body{zoom:1.15}
   </section>
   <section class="coll" id="getBox" aria-labelledby="getThere">
   <h2 id="getThere">Getting there</h2>
-  <p class="actsSub sec-help">Tap a card to open driving directions or flight searches from each family’s starting point. Below the cards, choose your family’s 1st, 2nd or 3rd choice to vote for this city.</p>
+  <p class="actsSub sec-help">Tap a card to open driving directions or flight searches from each family’s starting point to the city you picked above.</p>
   <div class="panel" id="panel"></div>
   <p class="note" id="note"></p>
   </section>
@@ -692,7 +701,9 @@ html.big body{zoom:1.15}
   </section>
   <section class="setup" id="voteSec" aria-labelledby="voteTitle" aria-live="polite">
     <h2 id="voteTitle">Family vote</h2>
-    <p class="actsSub sec-help">Each family ranks its top three cities: a 1st choice earns 3 points, 2nd earns 2 and 3rd earns 1. To vote, open a city and use the buttons under Getting there. Tap a city name here to jump to it.</p>
+    <p class="actsSub sec-help">Each family ranks its top three cities: a 1st choice earns 3 points, 2nd earns 2 and 3rd earns 1. To vote, pick a city on the map or with the city buttons, then tap 1st, 2nd or 3rd choice below. Tap a city name in the standings to jump to it.</p>
+    <div id="voteCtl" class="vote-ctl"></div>
+    <h3 class="sub-h">Standings</h3>
     <div id="voteBody"></div>
   </section>
   <section class="setup" id="datesSec" aria-labelledby="datesTitle">
@@ -789,7 +800,7 @@ html.big body{zoom:1.15}
   </dialog>
 
 
-  <p class="version" id="appVersion">Version 1.14.0 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 1.14.2 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
@@ -1538,7 +1549,7 @@ function setVote(rankIdx){
   if(LIVE)colOf('votes').doc(fam).set(votes[fam]).catch(saveErr);
 }
 function renderVoteCtl(){
-  let box=$('voteCtl');if(!box){box=document.createElement('div');box.id='voteCtl';box.className='vote-ctl';panel.appendChild(box);}
+  const box=$('voteCtl');if(!box)return;
   if(!fam){box.innerHTML=`<p class="vote-q">Vote for ${esc(city[0])}?</p><p class="err">${famButtons('Which family is voting?','vote')}</p>`;return;}
   const r=myRanks(fam),cur=r.indexOf(city[6]);
   box.innerHTML=`<p class="vote-q">${esc(fam)}'s vote for ${esc(city[0])}</p><div class="seg vote-seg" role="group" aria-label="Rank ${esc(city[0])}">${ORD.map((o,i)=>{const other=r[i]&&r[i]!==city[6]?r[i]:'';return `<button type="button" data-rank="${i}" aria-pressed="${cur===i}">${o} choice${other?`<span class="replaces">replaces ${esc(cityLabel(other))}</span>`:''}</button>`;}).join('')}</div>`;
@@ -1549,7 +1560,7 @@ function renderVotes(){
   const rows=Object.keys(pts).sort((a,b)=>pts[b]-pts[a]||a.localeCompare(b));
   const missing=FAMS.filter(f=>!myRanks(f).some(Boolean));
   let h='';
-  if(!rows.length)h='<p class="empty-note">No votes yet. Pick a city, then choose your family\u2019s 1st, 2nd or 3rd choice in its directions panel.</p>';
+  if(!rows.length)h='<p class="empty-note">No votes yet. Pick a city, then tap your family\u2019s 1st, 2nd or 3rd choice above.</p>';
   else{const top=pts[rows[0]];
     h='<ol class="vote-list">'+rows.map(k=>`<li class="${pts[k]===top?'lead':''}"><button type="button" class="linkbtn vote-go" data-go="${esc(k)}">${esc(cityLabel(k))}</button><span class="vote-fams">${who[k].sort((a,b)=>a[1]-b[1]).map(([f,i])=>`<span class="fam f${f}">${f} \u00b7 ${ORD[i]}</span>`).join('')}</span><strong class="vote-pts">${pts[k]} pt${pts[k]===1?'':'s'}</strong></li>`).join('')+'</ol>';}
   if(missing.length)h+=`<p class="hint">Still to vote: ${missing.join(', ')}.</p>`;

@@ -71,7 +71,12 @@ from both, with suggested cities near it.
     right after. A script adds the Hide/Show button automatically; sections
     start expanded and each device remembers what was hidden. New sections
     must follow this structure and get a menu link.
-11. **Update everywhere.** Each release updates `index.html`, the Claude
+11. **Consistent cards.** Every section uses the same card style (land
+    background, 1px border, 14px corners, 18px padding). Don't add one-off
+    borders, colored outlines or divider lines to individual sections. The
+    one exception is Our trip, the main dashboard, which has a gold stripe on
+    its top edge and a soft shadow.
+12. **Update everywhere.** Each release updates `index.html`, the Claude
     artifact and `CHANGELOG.md`, and `SETUP.md` when instructions change.
     Remind the user to upload to GitHub and check the version label.
 
@@ -85,11 +90,12 @@ page but grows and shrinks on its own):
 
 - **Left (map width):** Step 1 label, trip-type toggle, Map, Choose a
   meeting city (with + Add a destination), Getting there (directions or
-  flight cards and vote buttons), Who's traveling, then the Step 2 label,
+  flight cards), Who's traveling, then the Step 2 label,
   Places to stay, Filter things to do, Indoor, Outdoor, Hidden gems, Places
   to eat.
 - **Right:** Our trip (dashboard with Overview, Trip calendar and To-do list
-  tabs), Family vote, Travel dates (trip dates and suggested dates),
+  tabs), Family vote (vote buttons for the viewed city and standings), Travel
+  dates (trip dates and suggested dates),
   Weather (with packing hints), Trip cost (with Who pays what), Our picks,
   Family additions.
 
