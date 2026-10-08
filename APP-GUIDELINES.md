@@ -104,7 +104,8 @@ Who's traveling, Family vote, dates, weather, cost, then Step 2 (places to
 stay, filters, the four lists, Our picks, Family additions). New sections
 must be placed in one of the two columns and given a phone order.
 
-The menu also holds Expand all, Collapse all, Larger text, Print trip
+The menu opens as a sidebar and the page shifts to make room (never
+overlapping the cards). It also holds Expand all, Collapse all, Larger text, Print trip
 summary and Download a backup. The version label sits at the bottom.
 
 ## Shared data (Firestore collections under halfway/{code}/)

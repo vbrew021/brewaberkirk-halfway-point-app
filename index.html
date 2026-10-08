@@ -464,7 +464,7 @@ html.big body{zoom:1.15}
 .todo-mini{margin:4px 0 0}
 @media (min-width:1100px){main{max-width:1280px}}
 .hero{display:grid;grid-template-columns:minmax(0,1fr);gap:0 22px;align-items:start}
-@media (min-width:1000px){.hero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}.hero-right>.summary{margin-top:12px}}
+@container page (min-width:960px){.hero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}.hero-right>.summary{margin-top:12px}}
 .hero-left>section:first-of-type{margin-top:12px}
 .hero .toggle-wrap{margin-top:12px}
 #tabCal,#tabTodo,#tabOverview{container-type:inline-size}
@@ -486,16 +486,16 @@ html.big body{zoom:1.15}
 .toggle{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:440px}
 .toggle button+button{border-left:2px solid var(--ink)}
 @media (max-width:420px){.toggle button{padding:9px 10px}.toggle button strong{font-size:14px}}
-@media (max-width:999px){
+@container page (max-width:959.98px){
   .hero{display:flex;flex-direction:column}
   .hero-left,.hero-right{display:contents}
   #step1{order:0}#tripTop{order:1}#mapSec{order:2}#cityBox{order:3}#summarySec{order:4}#getBox{order:5}#setupSec{order:6}#voteSec{order:7}#datesSec{order:8}#weatherSec{order:9}#costSec{order:10}#step2{order:11}#staySec{order:12}#filterSec{order:13}#inSec{order:14}#outSec{order:15}#gemSec{order:16}#eatSec{order:17}#picksSec{order:18}#manageSec{order:19}
 }
 .hero-right>section{margin-top:16px}
 .hero-right>section.acts{margin:16px 0 8px;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--land)}
-@media (min-width:1000px){.hero-right .split th,.hero-right .split td{padding:8px 6px}.hero-right .fare-row label{flex:1 1 180px}}
+@container page (min-width:960px){.hero-right .split th,.hero-right .split td{padding:8px 6px}.hero-right .fare-row label{flex:1 1 180px}}
 .hero-left>.step-div:first-child{margin-top:12px}
-@media (min-width:1000px){.hero-right{padding-top:12px}.hero-right>section:first-child{margin-top:0}.hero-left .list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
+@container page (min-width:960px){.hero-right{padding-top:12px}.hero-right>section:first-child{margin-top:0}.hero-left .list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
 .hero-right>section.picks{margin-top:16px}
 /* consistent section cards */
 main section.coll{margin:16px 0 !important;padding:18px !important;border:1px solid var(--border) !important;border-top:1px solid var(--border) !important;border-radius:14px !important;background:var(--land) !important}
@@ -506,6 +506,19 @@ main section.coll#summarySec{border:2px solid var(--line) !important;box-shadow:
 .sec-head>h1,.sec-head>h2{min-width:0}
 .vote-ctl{border:0;padding:0;background:transparent;margin:4px 0 6px}
 #voteSec .sub-h{margin-top:14px}
+main{container-type:inline-size;container-name:page;transition:margin .25s ease,transform .25s ease}
+.nav-scrim{background:transparent}
+@media (min-width:900px){
+  html.nav-open main{margin-left:calc(min(300px,85vw) + 16px);margin-right:16px}
+  .nav-scrim{display:none}
+  .side-nav{box-shadow:none}
+}
+@media (max-width:899.98px){
+  html.nav-open main{transform:translateX(min(300px,85vw))}
+  html.nav-open,html.nav-open body{overflow-x:hidden}
+  .nav-scrim{left:min(300px,85vw)}
+}
+@media (prefers-reduced-motion:reduce){main{transition:none}}
 </style>
 </head>
 <body>
@@ -801,7 +814,7 @@ main section.coll#summarySec{border:2px solid var(--line) !important;box-shadow:
   </dialog>
 
 
-  <p class="version" id="appVersion">Version 1.14.4 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 1.15.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
@@ -1334,12 +1347,15 @@ $('famCode').onkeydown=e=>{if(e.key==='Enter')$('famCodeBtn').click();};
 
 /* ---------- side navigation ---------- */
 const nav=$('sideNav'),scrim=$('navScrim'),menuBtn=$('menuBtn');
-function setNav(open){nav.hidden=!open;scrim.hidden=!open;menuBtn.setAttribute('aria-expanded',open?'true':'false');if(open){const a=nav.querySelector('a');if(a)a.focus();}}
+if(nav.parentElement!==document.body){document.body.insertBefore(scrim,document.body.firstChild);document.body.insertBefore(nav,document.body.firstChild);}
+const wideNav=()=>!window.matchMedia||window.matchMedia('(min-width: 900px)').matches;
+function setNav(open){nav.hidden=!open;scrim.hidden=!open||wideNav();document.documentElement.classList.toggle('nav-open',open);menuBtn.setAttribute('aria-expanded',open?'true':'false');if(open&&!wideNav()){const a=nav.querySelector('a');if(a)a.focus();}}
+if(window.matchMedia){const mq=window.matchMedia('(min-width: 900px)');const f=()=>{if(!nav.hidden)scrim.hidden=mq.matches;};mq.addEventListener?mq.addEventListener('change',f):mq.addListener&&mq.addListener(f);}
 menuBtn.onclick=()=>setNav(nav.hidden);
 scrim.onclick=()=>setNav(false);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!nav.hidden){setNav(false);menuBtn.focus();}});
 nav.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;e.preventDefault();
-  const t=document.querySelector(a.getAttribute('href'));setNav(false);
+  const t=document.querySelector(a.getAttribute('href'));if(!wideNav())setNav(false);
   if(t&&t.classList.contains('dash-panel')&&typeof activateTab==='function')activateTab(t.id,false,true);
   if(t){if(t.scrollIntoView)t.scrollIntoView({behavior:'smooth',block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');try{t.focus({preventScroll:true});}catch(err){}}});
 

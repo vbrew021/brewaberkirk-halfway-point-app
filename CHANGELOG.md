@@ -10,6 +10,13 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.15.0 (October 8, 2026)
+- Changed: the menu no longer covers the page. On a computer it opens as a
+  sidebar and the page shifts right to make room (switching to one column
+  if space gets tight); it stays open while you jump between sections and
+  closes with the menu button or Esc. On a phone the page slides over to
+  make room; tap the page or the menu button to close it.
+
 ## 1.14.4 (October 8, 2026)
 - Fixed: the Our trip tabs no longer show an unnecessary scroll bar. On a
   narrow phone the tabs can still be swiped sideways if they don't fit.
