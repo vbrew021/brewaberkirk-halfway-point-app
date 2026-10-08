@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Put your family code here, between the single quotes. This is the only line to change.
-    function isFamily(code) { return code == 'YOUR-FAMILY-CODE'; }
+    function isFamily(code) { return code == 'BrewAberKirk21'; }
 
     // Starred picks
     match /halfway/{code}/picks/{pickId} {
