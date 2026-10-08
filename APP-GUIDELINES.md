@@ -78,23 +78,28 @@ from both, with suggested cities near it.
 ## Page order (top to bottom)
 
 Top bar: menu button, app name (links home), "I'm with" family chooser, How
-this works. Then two steps.
+this works.
 
-**Step 1: Decide where and when.** A two-column area on a computer. Left:
-trip-type toggle, Map, Choose a meeting city (with + Add a destination),
-Getting there (directions or flight cards and vote buttons), Who's
-traveling. Right: Our trip (dashboard with Overview, Trip calendar and
-To-do list tabs), Family vote, Travel dates (trip dates and suggested
-dates), Weather (with packing hints), Trip cost (with Who pays what). On a
-phone these stack: toggle, map, cities, Our trip, Getting there, Who's
-traveling, Family vote, dates, weather, cost.
+On a computer the page is two independent columns (each scrolls with the
+page but grows and shrinks on its own):
 
-**Step 2: Plan the trip.** Places to stay, Filter things to do, Indoor,
-Outdoor, Hidden gems, Places to eat, Our picks, Family additions, version
-label.
+- **Left (map width):** Step 1 label, trip-type toggle, Map, Choose a
+  meeting city (with + Add a destination), Getting there (directions or
+  flight cards and vote buttons), Who's traveling, then the Step 2 label,
+  Places to stay, Filter things to do, Indoor, Outdoor, Hidden gems, Places
+  to eat.
+- **Right:** Our trip (dashboard with Overview, Trip calendar and To-do list
+  tabs), Family vote, Travel dates (trip dates and suggested dates),
+  Weather (with packing hints), Trip cost (with Who pays what), Our picks,
+  Family additions.
+
+On a phone everything stacks: toggle, map, cities, Our trip, Getting there,
+Who's traveling, Family vote, dates, weather, cost, then Step 2 (places to
+stay, filters, the four lists, Our picks, Family additions). New sections
+must be placed in one of the two columns and given a phone order.
 
 The menu also holds Expand all, Collapse all, Larger text, Print trip
-summary and Download a backup.
+summary and Download a backup. The version label sits at the bottom.
 
 ## Shared data (Firestore collections under halfway/{code}/)
 

@@ -488,11 +488,14 @@ html.big body{zoom:1.15}
 @media (max-width:999px){
   .hero{display:flex;flex-direction:column}
   .hero-left,.hero-right{display:contents}
-  #tripTop{order:1}#mapSec{order:2}#cityBox{order:3}#summarySec{order:4}#getBox{order:5}#setupSec{order:6}#voteSec{order:7}#datesSec{order:8}#weatherSec{order:9}#costSec{order:10}
+  #step1{order:0}#tripTop{order:1}#mapSec{order:2}#cityBox{order:3}#summarySec{order:4}#getBox{order:5}#setupSec{order:6}#voteSec{order:7}#datesSec{order:8}#weatherSec{order:9}#costSec{order:10}#step2{order:11}#staySec{order:12}#filterSec{order:13}#inSec{order:14}#outSec{order:15}#gemSec{order:16}#eatSec{order:17}#picksSec{order:18}#manageSec{order:19}
 }
 .hero-right>section{margin-top:16px}
 .hero-right>section.acts{margin:16px 0 8px;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--land)}
 @media (min-width:1000px){.hero-right .split th,.hero-right .split td{padding:8px 6px}.hero-right .fare-row label{flex:1 1 180px}}
+.hero-left>.step-div:first-child{margin-top:12px}
+@media (min-width:1000px){.hero-right{padding-top:12px}.hero-right>section:first-child{margin-top:0}.hero-left .list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
+.hero-right>section.picks{margin-top:16px}
 </style>
 </head>
 <body>
@@ -553,9 +556,9 @@ html.big body{zoom:1.15}
     <p class="hint">Tips: the ☰ button at the top left jumps straight to any section, and the Hide button next to each section title tucks it away until you need it.</p>
     <div class="pick-actions"><button type="button" class="btn primary" id="welcomeClose">Get started</button></div>
   </dialog>
-  <div class="step-div" id="step1"><span class="step-num">Step 1</span><span class="step-name">Decide where and when</span></div>
   <div class="hero" id="hero">
     <div class="hero-left">
+  <div class="step-div" id="step1"><span class="step-num">Step 1</span><span class="step-name">Decide where and when</span></div>
   <div class="toggle-wrap" id="tripTop">
     <span class="toggle-label" id="toggleLabel">Show halfway points for</span>
     <div class="toggle" role="group" aria-labelledby="toggleLabel">
@@ -609,6 +612,49 @@ html.big body{zoom:1.15}
       <label class="check"><input type="checkbox" id="adultKid"> The Brews' 19-year-old is coming</label>
     </div>
     <p class="party" id="party"></p>
+  </section>
+  <div class="step-div" id="step2"><span class="step-num">Step 2</span><span class="step-name">Plan the trip</span></div>
+  <section class="acts" id="staySec" aria-live="polite">
+    <h2 id="stayTitle">Places to stay</h2>
+    <p class="actsSub sec-help" id="staySub"></p>
+    <div class="stay-links" id="stayLinks"></div>
+    <ol id="stays" class="list"></ol>
+    <div class="suggest" data-sec="stay"></div>
+  </section>
+  <section class="acts" id="filterSec" aria-labelledby="filterTitle">
+    <h2 id="filterTitle">Filter things to do</h2>
+    <p class="actsSub sec-help">Tap a filter to show only matching activities, and tap it again to turn it off. You can combine filters; they apply to indoor, outdoor and hidden gems.</p>
+    <div class="filters" id="filters">
+      <button type="button" data-f="F" aria-pressed="false">Free</button>
+      <button type="button" data-f="L" aria-pressed="false">Great for the 5-year-old</button>
+      <button type="button" data-f="G" aria-pressed="false">Easy for grandparents</button>
+      <button type="button" data-f="T" aria-pressed="false">Fun for the 19-year-old</button>
+      <button type="button" data-f="noS" aria-pressed="false">Year-round only</button>
+    </div>
+  </section>
+  <section class="acts" id="inSec" aria-live="polite">
+    <h2 id="inTitle">Indoor things to do</h2>
+    <p class="actsSub sec-help" id="inCount"></p>
+    <ol id="actsIn" class="list"></ol>
+    <div class="suggest" data-sec="in"></div>
+  </section>
+  <section class="acts" id="outSec" aria-live="polite">
+    <h2 id="outTitle">Outdoor things to do</h2>
+    <p class="actsSub sec-help" id="outCount"></p>
+    <ol id="actsOut" class="list"></ol>
+    <div class="suggest" data-sec="out"></div>
+  </section>
+  <section class="acts gems" id="gemSec" aria-live="polite">
+    <h2 id="gemTitle">Hidden gems</h2>
+    <p class="actsSub sec-help" id="gemCount"></p>
+    <ol id="actsGem" class="list"></ol>
+    <div class="suggest" data-sec="gem"></div>
+  </section>
+  <section class="acts" id="eatSec" aria-live="polite">
+    <h2 id="eatsTitle">Family-friendly places to eat</h2>
+    <p class="actsSub sec-help">Casual, local favorites with something for picky eaters. Tap a name for Google Maps or ☆ to add it to Our picks. Restaurants change often, so check hours before you go.</p>
+    <ol id="eats" class="list"></ol>
+    <div class="suggest" data-sec="eat"></div>
   </section>
     </div>
     <div class="hero-right">
@@ -698,67 +744,6 @@ html.big body{zoom:1.15}
       </div>
     </details>
   </section>
-    </div>
-  </div>
-  <dialog id="cal" aria-labelledby="calTitle">
-    <div class="cal-head"><h2 id="calTitle">Choose start date</h2><button type="button" class="linkbtn" id="calClose" aria-label="Close calendar">Close</button></div>
-    <div class="cal-steps" role="group" aria-label="Which date are you choosing">
-      <button type="button" data-which="start" aria-pressed="true"><span>Start</span><strong id="calStartTxt">—</strong></button>
-      <button type="button" data-which="end" aria-pressed="false"><span>End</span><strong id="calEndTxt">—</strong></button>
-    </div>
-    <div class="cal-nav">
-      <button type="button" class="cal-arrow" id="calPrev" aria-label="Previous month">‹</button>
-      <label class="sr" for="calMonth">Month</label><select id="calMonth"></select>
-      <label class="sr" for="calYear">Year</label><select id="calYear"></select>
-      <button type="button" class="cal-arrow" id="calNext" aria-label="Next month">›</button>
-    </div>
-    <div class="cal-grid" id="calGrid" role="grid" aria-labelledby="calTitle"></div>
-    <div class="pick-actions cal-foot"><button type="button" class="linkbtn" id="calClear">Clear</button><button type="button" class="btn primary" id="calDone">Done</button></div>
-  </dialog>
-
-  <div class="step-div" id="step2"><span class="step-num">Step 2</span><span class="step-name">Plan the trip</span></div>
-  <section class="acts" id="staySec" aria-live="polite">
-    <h2 id="stayTitle">Places to stay</h2>
-    <p class="actsSub sec-help" id="staySub"></p>
-    <div class="stay-links" id="stayLinks"></div>
-    <ol id="stays" class="list"></ol>
-    <div class="suggest" data-sec="stay"></div>
-  </section>
-  <section class="acts" id="filterSec" aria-labelledby="filterTitle">
-    <h2 id="filterTitle">Filter things to do</h2>
-    <p class="actsSub sec-help">Tap a filter to show only matching activities, and tap it again to turn it off. You can combine filters; they apply to indoor, outdoor and hidden gems.</p>
-    <div class="filters" id="filters">
-      <button type="button" data-f="F" aria-pressed="false">Free</button>
-      <button type="button" data-f="L" aria-pressed="false">Great for the 5-year-old</button>
-      <button type="button" data-f="G" aria-pressed="false">Easy for grandparents</button>
-      <button type="button" data-f="T" aria-pressed="false">Fun for the 19-year-old</button>
-      <button type="button" data-f="noS" aria-pressed="false">Year-round only</button>
-    </div>
-  </section>
-  <section class="acts" id="inSec" aria-live="polite">
-    <h2 id="inTitle">Indoor things to do</h2>
-    <p class="actsSub sec-help" id="inCount"></p>
-    <ol id="actsIn" class="list"></ol>
-    <div class="suggest" data-sec="in"></div>
-  </section>
-  <section class="acts" id="outSec" aria-live="polite">
-    <h2 id="outTitle">Outdoor things to do</h2>
-    <p class="actsSub sec-help" id="outCount"></p>
-    <ol id="actsOut" class="list"></ol>
-    <div class="suggest" data-sec="out"></div>
-  </section>
-  <section class="acts gems" id="gemSec" aria-live="polite">
-    <h2 id="gemTitle">Hidden gems</h2>
-    <p class="actsSub sec-help" id="gemCount"></p>
-    <ol id="actsGem" class="list"></ol>
-    <div class="suggest" data-sec="gem"></div>
-  </section>
-  <section class="acts" id="eatSec" aria-live="polite">
-    <h2 id="eatsTitle">Family-friendly places to eat</h2>
-    <p class="actsSub sec-help">Casual, local favorites with something for picky eaters. Tap a name for Google Maps or ☆ to add it to Our picks. Restaurants change often, so check hours before you go.</p>
-    <ol id="eats" class="list"></ol>
-    <div class="suggest" data-sec="eat"></div>
-  </section>
   <section class="picks" id="picksSec" aria-labelledby="picksTitle">
     <div class="picks-head">
       <h2 id="picksTitle">Our picks</h2>
@@ -779,14 +764,32 @@ html.big body{zoom:1.15}
     </div>
     <p class="status" id="shareStatus" role="status"></p>
   </section>
-
   <section class="acts manage" id="manageSec" aria-labelledby="manageTitle">
     <h2 id="manageTitle">Family additions</h2>
     <p class="actsSub sec-help">Every destination and suggestion the family has added, across all cities. Tap Remove to delete one for everyone; you’ll be asked to confirm. Download a backup saves all shared family data to a file, just in case.</p>
     <div id="manageList"></div>
     <div class="pick-actions"><button type="button" class="btn small" id="backupBtn2">Download a backup of all family data</button></div>
   </section>
-  <p class="version" id="appVersion">Version 1.13.0 · October 8, 2026</p>
+    </div>
+  </div>
+  <dialog id="cal" aria-labelledby="calTitle">
+    <div class="cal-head"><h2 id="calTitle">Choose start date</h2><button type="button" class="linkbtn" id="calClose" aria-label="Close calendar">Close</button></div>
+    <div class="cal-steps" role="group" aria-label="Which date are you choosing">
+      <button type="button" data-which="start" aria-pressed="true"><span>Start</span><strong id="calStartTxt">—</strong></button>
+      <button type="button" data-which="end" aria-pressed="false"><span>End</span><strong id="calEndTxt">—</strong></button>
+    </div>
+    <div class="cal-nav">
+      <button type="button" class="cal-arrow" id="calPrev" aria-label="Previous month">‹</button>
+      <label class="sr" for="calMonth">Month</label><select id="calMonth"></select>
+      <label class="sr" for="calYear">Year</label><select id="calYear"></select>
+      <button type="button" class="cal-arrow" id="calNext" aria-label="Next month">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid" role="grid" aria-labelledby="calTitle"></div>
+    <div class="pick-actions cal-foot"><button type="button" class="linkbtn" id="calClear">Clear</button><button type="button" class="btn primary" id="calDone">Done</button></div>
+  </dialog>
+
+
+  <p class="version" id="appVersion">Version 1.14.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>

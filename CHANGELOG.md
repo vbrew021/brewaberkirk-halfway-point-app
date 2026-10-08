@@ -10,6 +10,16 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.14.0 (October 8, 2026)
+- Changed: the whole page is now two independent columns on a computer.
+  Left (the map's width): Step 1's trip toggle, map, cities, Getting there
+  and Who's traveling, then Step 2's places to stay, filters and the four
+  lists. Right: Our trip, Family vote, Travel dates, Weather, Trip cost,
+  Our picks and Family additions. Hiding or expanding a section on one
+  side no longer moves anything on the other side.
+- On a phone the order is unchanged apart from Our picks and Family
+  additions, which stay at the end.
+
 ## 1.13.0 (October 8, 2026)
 - Changed: all of Step 1 now sits in the two-column area on a computer.
   Left: trip toggle, map, Choose a meeting city, Getting there and Who's
