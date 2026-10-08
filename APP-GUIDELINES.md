@@ -65,13 +65,18 @@ from both, with suggested cities near it.
    example, the trip plan is a small calendar that opens a day popup).
 9. **No browser storage for shared data.** `localStorage` is only a
    per-device fallback and cache; shared data lives in Firestore.
-10. **Update everywhere.** Each release updates `index.html`, the Claude
+10. **Collapsible sections.** Every section is a `<section>` with an `id`
+    placed directly in `<main>`, with its heading first and the how-to text
+    right after. A script adds the Hide/Show button automatically; sections
+    start expanded and each device remembers what was hidden. New sections
+    must follow this structure and get a menu link.
+11. **Update everywhere.** Each release updates `index.html`, the Claude
     artifact and `CHANGELOG.md`, and `SETUP.md` when instructions change.
     Remind the user to upload to GitHub and check the version label.
 
 ## Page order (top to bottom)
 
-Menu button and app name (links home), trip-type toggle, map, Choose a meeting
+Menu button and app name (links home), trip-type toggle, map (collapsible), Choose a meeting
 city (with + Add a destination), Getting there (directions or flight cards
 and voting), Who's traveling, Travel dates (trip dates and suggested dates),
 Weather (with packing hints),

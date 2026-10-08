@@ -10,6 +10,14 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.9.0 (October 8, 2026)
+- Added: every section can be collapsed with the Hide/Show button next to its
+  title. Sections start expanded; each device remembers what you hide, and
+  jumping to a section from the menu opens it.
+- Added: Expand all and Collapse all at the bottom of the menu.
+- Changed: the map and the city and Getting there areas are now their own
+  sections, and the map title sits above the town names.
+
 ## 1.8.0 (October 8, 2026)
 - Added: Suggested dates in Travel dates. Anyone can suggest a date range
   with an optional note; each family answers Works, Maybe or Can't; the best
