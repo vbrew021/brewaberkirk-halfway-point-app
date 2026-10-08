@@ -451,8 +451,9 @@ html.big body{zoom:1.15}
   #printView .pv-sub,#printView .pv-foot{color:#333}
   @page{margin:0.6in}
 }
-.dash-tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin:0 0 12px;overflow-x:auto}
-.dash-tabs [role=tab]{font:inherit;font-size:15px;font-weight:700;padding:10px 14px;min-height:44px;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
+.dash-tabs{display:flex;gap:4px;margin:0 0 12px;overflow-x:auto;overflow-y:hidden;box-shadow:inset 0 -2px 0 var(--border);scrollbar-width:none}
+.dash-tabs::-webkit-scrollbar{display:none}
+.dash-tabs [role=tab]{font:inherit;font-size:15px;font-weight:700;padding:10px 14px;min-height:44px;border:0;border-bottom:3px solid transparent;margin-bottom:0;flex:none;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
 .dash-tabs [role=tab][aria-selected="true"]{color:var(--ink);border-bottom-color:var(--line)}
 .dash-tabs [role=tab]:focus-visible{outline:3px solid var(--line);outline-offset:-3px}
 .dash-h{font-size:16px;font-weight:800;margin:0 0 4px}
@@ -800,7 +801,7 @@ main section.coll#summarySec{border:2px solid var(--line) !important;box-shadow:
   </dialog>
 
 
-  <p class="version" id="appVersion">Version 1.14.3 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 1.14.4 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>

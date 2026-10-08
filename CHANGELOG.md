@@ -10,6 +10,10 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.14.4 (October 8, 2026)
+- Fixed: the Our trip tabs no longer show an unnecessary scroll bar. On a
+  narrow phone the tabs can still be swiped sideways if they don't fit.
+
 ## 1.14.3 (October 8, 2026)
 - Changed: Our trip is back to its full gold border (as before 1.14.1),
   replacing the top stripe and shadow.
