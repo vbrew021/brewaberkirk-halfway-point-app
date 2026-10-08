@@ -80,14 +80,14 @@ from both, with suggested cities near it.
 Top bar: menu button, app name (links home), "I'm with" family chooser, How
 this works. Then two steps.
 
-**Step 1: Decide where and when.** A two-column area on a computer (stacked
-on a phone, map first): left has the trip-type toggle, Map and Choose a
-meeting city (with + Add a destination); right has Our trip, a dashboard
-with Overview, Trip calendar (calendar with day popups) and To-do list as
-tabs. Then Getting there (directions or flight cards
-and vote buttons), Who's traveling, Family vote, Travel dates (trip dates and
-suggested dates), Weather (with packing hints), Trip cost (with Who pays
-what).
+**Step 1: Decide where and when.** A two-column area on a computer. Left:
+trip-type toggle, Map, Choose a meeting city (with + Add a destination),
+Getting there (directions or flight cards and vote buttons), Who's
+traveling. Right: Our trip (dashboard with Overview, Trip calendar and
+To-do list tabs), Family vote, Travel dates (trip dates and suggested
+dates), Weather (with packing hints), Trip cost (with Who pays what). On a
+phone these stack: toggle, map, cities, Our trip, Getting there, Who's
+traveling, Family vote, dates, weather, cost.
 
 **Step 2: Plan the trip.** Places to stay, Filter things to do, Indoor,
 Outdoor, Hidden gems, Places to eat, Our picks, Family additions, version

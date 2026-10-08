@@ -10,6 +10,14 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.13.0 (October 8, 2026)
+- Changed: all of Step 1 now sits in the two-column area on a computer.
+  Left: trip toggle, map, Choose a meeting city, Getting there and Who's
+  traveling. Right: Our trip, Family vote, Travel dates, Weather and Trip
+  cost. On a phone everything stacks in this order: toggle, map, cities,
+  Our trip, Getting there, Who's traveling, Family vote, dates, weather,
+  cost.
+
 ## 1.12.0 (October 8, 2026)
 - Changed: the trip toggle, map and city buttons are back at the top, with
   Our trip beside them on a computer (left: map and cities; right: Our trip

@@ -485,6 +485,14 @@ html.big body{zoom:1.15}
 .toggle{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:440px}
 .toggle button+button{border-left:2px solid var(--ink)}
 @media (max-width:420px){.toggle button{padding:9px 10px}.toggle button strong{font-size:14px}}
+@media (max-width:999px){
+  .hero{display:flex;flex-direction:column}
+  .hero-left,.hero-right{display:contents}
+  #tripTop{order:1}#mapSec{order:2}#cityBox{order:3}#summarySec{order:4}#getBox{order:5}#setupSec{order:6}#voteSec{order:7}#datesSec{order:8}#weatherSec{order:9}#costSec{order:10}
+}
+.hero-right>section{margin-top:16px}
+.hero-right>section.acts{margin:16px 0 8px;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--land)}
+@media (min-width:1000px){.hero-right .split th,.hero-right .split td{padding:8px 6px}.hero-right .fare-row label{flex:1 1 180px}}
 </style>
 </head>
 <body>
@@ -582,6 +590,26 @@ html.big body{zoom:1.15}
     </div>
   </div>
   </section>
+  <section class="coll" id="getBox" aria-labelledby="getThere">
+  <h2 id="getThere">Getting there</h2>
+  <p class="actsSub sec-help">Tap a card to open driving directions or flight searches from each family’s starting point. Below the cards, choose your family’s 1st, 2nd or 3rd choice to vote for this city.</p>
+  <div class="panel" id="panel"></div>
+  <p class="note" id="note"></p>
+  </section>
+  <section class="setup" id="setupSec" aria-labelledby="setupTitle">
+    <h2 id="setupTitle">Who's traveling</h2>
+    <p class="actsSub sec-help">Choose where each group starts and whether the Brews’ 19-year-old is coming. This sets the directions, flights, lodging searches and trip cost.</p>
+    <div class="setup-grid">
+      <label>Brew &amp; Kirk start from
+        <select id="miFrom"><option value="sl">Spring Lake</option><option value="gr">Grand Rapids</option><option value="det">Detroit</option></select>
+      </label>
+      <label>Aber starts from
+        <select id="txFrom"><option value="an">Andice</option><option value="aus">Austin</option></select>
+      </label>
+      <label class="check"><input type="checkbox" id="adultKid"> The Brews' 19-year-old is coming</label>
+    </div>
+    <p class="party" id="party"></p>
+  </section>
     </div>
     <div class="hero-right">
   <section class="setup summary" id="summarySec" aria-labelledby="sumTitle" aria-live="polite">
@@ -616,28 +644,6 @@ html.big body{zoom:1.15}
       </div>
     </div>
   </section>
-    </div>
-  </div>
-  <section class="coll" id="getBox" aria-labelledby="getThere">
-  <h2 id="getThere">Getting there</h2>
-  <p class="actsSub sec-help">Tap a card to open driving directions or flight searches from each family’s starting point. Below the cards, choose your family’s 1st, 2nd or 3rd choice to vote for this city.</p>
-  <div class="panel" id="panel"></div>
-  <p class="note" id="note"></p>
-  </section>
-  <section class="setup" id="setupSec" aria-labelledby="setupTitle">
-    <h2 id="setupTitle">Who's traveling</h2>
-    <p class="actsSub sec-help">Choose where each group starts and whether the Brews’ 19-year-old is coming. This sets the directions, flights, lodging searches and trip cost.</p>
-    <div class="setup-grid">
-      <label>Brew &amp; Kirk start from
-        <select id="miFrom"><option value="sl">Spring Lake</option><option value="gr">Grand Rapids</option><option value="det">Detroit</option></select>
-      </label>
-      <label>Aber starts from
-        <select id="txFrom"><option value="an">Andice</option><option value="aus">Austin</option></select>
-      </label>
-      <label class="check"><input type="checkbox" id="adultKid"> The Brews' 19-year-old is coming</label>
-    </div>
-    <p class="party" id="party"></p>
-  </section>
   <section class="setup" id="voteSec" aria-labelledby="voteTitle" aria-live="polite">
     <h2 id="voteTitle">Family vote</h2>
     <p class="actsSub sec-help">Each family ranks its top three cities: a 1st choice earns 3 points, 2nd earns 2 and 3rd earns 1. To vote, open a city and use the buttons under Getting there. Tap a city name here to jump to it.</p>
@@ -657,22 +663,6 @@ html.big body{zoom:1.15}
     <div id="propForm" class="add-form" hidden></div>
     <div id="dateOpts" aria-live="polite"></div>
   </section>
-  <dialog id="cal" aria-labelledby="calTitle">
-    <div class="cal-head"><h2 id="calTitle">Choose start date</h2><button type="button" class="linkbtn" id="calClose" aria-label="Close calendar">Close</button></div>
-    <div class="cal-steps" role="group" aria-label="Which date are you choosing">
-      <button type="button" data-which="start" aria-pressed="true"><span>Start</span><strong id="calStartTxt">—</strong></button>
-      <button type="button" data-which="end" aria-pressed="false"><span>End</span><strong id="calEndTxt">—</strong></button>
-    </div>
-    <div class="cal-nav">
-      <button type="button" class="cal-arrow" id="calPrev" aria-label="Previous month">‹</button>
-      <label class="sr" for="calMonth">Month</label><select id="calMonth"></select>
-      <label class="sr" for="calYear">Year</label><select id="calYear"></select>
-      <button type="button" class="cal-arrow" id="calNext" aria-label="Next month">›</button>
-    </div>
-    <div class="cal-grid" id="calGrid" role="grid" aria-labelledby="calTitle"></div>
-    <div class="pick-actions cal-foot"><button type="button" class="linkbtn" id="calClear">Clear</button><button type="button" class="btn primary" id="calDone">Done</button></div>
-  </dialog>
-
   <section class="setup" id="weatherSec" aria-labelledby="weatherTitle" aria-live="polite">
     <h2 id="weatherTitle">Weather</h2>
     <p class="actsSub sec-help">Shows the forecast for trip days within about 16 days, plus what’s typical for your dates and packing hints. It updates when you change the city or dates.</p>
@@ -683,9 +673,9 @@ html.big body{zoom:1.15}
     <p class="actsSub sec-help">Enter round-trip fares from Google Flights, choose drive or fly for each group, and pick how to split lodging. Tap Adjust assumptions to change gas, cars, nights and rates. Estimates only: road miles are about 1.2 times the straight-line distance.</p>
     <div class="fare-row">
       <label>Round-trip fare per person, <span id="fareMiLabel"></span>
-        <span class="money"><span>$</span><input type="number" min="0" step="1" inputmode="numeric" id="fareMi" placeholder="Enter fare"></span></label>
+        <span class="money"><span>$</span><input type="number" min="0" step="1" inputmode="numeric" id="fareMi" placeholder="0"></span></label>
       <label>Round-trip fare per person, <span id="fareTxLabel"></span>
-        <span class="money"><span>$</span><input type="number" min="0" step="1" inputmode="numeric" id="fareTx" placeholder="Enter fare"></span></label>
+        <span class="money"><span>$</span><input type="number" min="0" step="1" inputmode="numeric" id="fareTx" placeholder="0"></span></label>
     </div>
     <div class="cost-grid" id="costGrid"></div>
     <h3 class="split-title">Who pays what</h3>
@@ -708,6 +698,24 @@ html.big body{zoom:1.15}
       </div>
     </details>
   </section>
+    </div>
+  </div>
+  <dialog id="cal" aria-labelledby="calTitle">
+    <div class="cal-head"><h2 id="calTitle">Choose start date</h2><button type="button" class="linkbtn" id="calClose" aria-label="Close calendar">Close</button></div>
+    <div class="cal-steps" role="group" aria-label="Which date are you choosing">
+      <button type="button" data-which="start" aria-pressed="true"><span>Start</span><strong id="calStartTxt">—</strong></button>
+      <button type="button" data-which="end" aria-pressed="false"><span>End</span><strong id="calEndTxt">—</strong></button>
+    </div>
+    <div class="cal-nav">
+      <button type="button" class="cal-arrow" id="calPrev" aria-label="Previous month">‹</button>
+      <label class="sr" for="calMonth">Month</label><select id="calMonth"></select>
+      <label class="sr" for="calYear">Year</label><select id="calYear"></select>
+      <button type="button" class="cal-arrow" id="calNext" aria-label="Next month">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid" role="grid" aria-labelledby="calTitle"></div>
+    <div class="pick-actions cal-foot"><button type="button" class="linkbtn" id="calClear">Clear</button><button type="button" class="btn primary" id="calDone">Done</button></div>
+  </dialog>
+
   <div class="step-div" id="step2"><span class="step-num">Step 2</span><span class="step-name">Plan the trip</span></div>
   <section class="acts" id="staySec" aria-live="polite">
     <h2 id="stayTitle">Places to stay</h2>
@@ -778,7 +786,7 @@ html.big body{zoom:1.15}
     <div id="manageList"></div>
     <div class="pick-actions"><button type="button" class="btn small" id="backupBtn2">Download a backup of all family data</button></div>
   </section>
-  <p class="version" id="appVersion">Version 1.12.0 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 1.13.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
