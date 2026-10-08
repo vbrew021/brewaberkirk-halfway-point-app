@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Put your family code here, between the single quotes. This is the only line to change.
-    function isFamily(code) { return code == 'BrewAberKirk21'; }
+    function isFamily(code) { return code == 'YOUR-FAMILY-CODE'; }
 
     // Starred picks
     match /halfway/{code}/picks/{pickId} {
@@ -50,6 +50,32 @@ service cloud.firestore {
         && request.resource.data.start is string && request.resource.data.start.size() <= 10
         && request.resource.data.end is string && request.resource.data.end.size() <= 10
         && request.resource.data.by in ['Brew', 'Aber', 'Kirk', '']
+        && request.resource.data.ts is number;
+    }
+
+    // Each family's ranked city votes (document name is the family)
+    match /halfway/{code}/votes/{famId} {
+      allow read, delete: if isFamily(code);
+      allow create, update: if isFamily(code)
+        && famId in ['Brew', 'Aber', 'Kirk']
+        && request.resource.data.keys().hasOnly(['r', 'by', 'ts'])
+        && request.resource.data.by == famId
+        && request.resource.data.r is list && request.resource.data.r.size() <= 3
+        && request.resource.data.ts is number;
+    }
+
+    // Day-by-day trip plan (one document per city and day)
+    match /halfway/{code}/plan/{dayId} {
+      allow read, delete: if isFamily(code);
+      allow create, update: if isFamily(code)
+        && request.resource.data.keys().hasOnly(['city', 'date', 'travel', 'acts', 'b', 'l', 'dn', 'note', 'by', 'ts'])
+        && request.resource.data.city is string && request.resource.data.city.size() <= 120
+        && request.resource.data.date is string && request.resource.data.date.size() == 10
+        && request.resource.data.travel in ['', 'yes', 'no']
+        && request.resource.data.acts is list && request.resource.data.acts.size() <= 20
+        && request.resource.data.b is map && request.resource.data.l is map && request.resource.data.dn is map
+        && request.resource.data.note is string && request.resource.data.note.size() <= 1000
+        && request.resource.data.by is string && request.resource.data.by.size() <= 10
         && request.resource.data.ts is number;
     }
   }

@@ -10,6 +10,19 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.7.0 (October 8, 2026)
+- Added: Family vote. Each family ranks its top three cities (3, 2 and 1
+  points) from any city's directions panel, and the standings show the
+  leader and who still needs to vote.
+- Added: Trip plan, a day-by-day plan for your dates in each city, with
+  activities, breakfast, lunch and dinner (eat out at a listed restaurant or
+  a cook-at-home idea) and notes. Travel days are highlighted, with the first
+  and last days marked automatically. Includes Map this day, Add to calendar
+  and Copy plan as text.
+- Added: Who pays what, splitting gas, flights and lodging by family.
+- Added: Packing hints in the Weather section, based on your dates.
+- Needs updated Firebase rules (votes and trip plan).
+
 ## 1.6.1 (October 8, 2026)
 - Faster weather: each device remembers which weather services work and
   goes to them first, gives up on an unresponsive service after about 4
