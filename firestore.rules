@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Put your family code here, between the single quotes. This is the only line to change.
-    function isFamily(code) { return code == 'BrewAberKirk21'; }
+    function isFamily(code) { return code == 'YOUR-FAMILY-CODE'; }
 
     // Starred picks
     match /halfway/{code}/picks/{pickId} {
@@ -91,6 +91,18 @@ service cloud.firestore {
         && request.resource.data.ts is number
         && request.resource.data.resp is map
         && request.resource.data.resp.keys().hasOnly(['Brew', 'Aber', 'Kirk']);
+    }
+
+    // Shared to-do list
+    match /halfway/{code}/todos/{todoId} {
+      allow read, delete: if isFamily(code);
+      allow create, update: if isFamily(code)
+        && request.resource.data.keys().hasOnly(['t', 'who', 'done', 'by', 'ts'])
+        && request.resource.data.t is string && request.resource.data.t.size() > 0 && request.resource.data.t.size() <= 120
+        && request.resource.data.who in ['Everyone', 'Brew', 'Aber', 'Kirk']
+        && request.resource.data.done is bool
+        && request.resource.data.by in ['Brew', 'Aber', 'Kirk', '']
+        && request.resource.data.ts is number;
     }
   }
 }

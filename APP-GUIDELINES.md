@@ -48,9 +48,10 @@ from both, with suggested cities near it.
 4. **Family additions look different.** Anything a family member adds
    (destinations, suggestions) uses the dashed purple style and is labeled
    with who added it. Everything added can be removed, with a confirmation.
-5. **Family labels.** Picks, votes, suggestions and plan edits are labeled
+5. **Family labels.** The "I'm with" chooser in the top bar sets the family
+   for the device. Picks, votes, suggestions, dates and plan edits are labeled
    Brew, Aber or Kirk. If no family is chosen, offer the three family buttons
-   inline rather than sending people elsewhere.
+   inline or point to "I'm with" rather than sending people elsewhere.
 6. **Stay honest about built-in content.** Built-in activities, hidden gems,
    restaurants and lodging come from Claude's knowledge; only list places
    Claude is confident still exist, and leave gaps rather than guess.
@@ -76,13 +77,21 @@ from both, with suggested cities near it.
 
 ## Page order (top to bottom)
 
-Menu button and app name (links home), trip-type toggle, map (collapsible), Choose a meeting
+Top bar: menu button, app name (links home), "I'm with" family chooser, How
+this works. Then Trip at a glance, followed by two steps.
+
+**Step 1: Decide where and when.** Trip-type toggle, Map, Choose a meeting
 city (with + Add a destination), Getting there (directions or flight cards
-and voting), Who's traveling, Travel dates (trip dates and suggested dates),
-Weather (with packing hints),
-Family vote, Our picks, Trip plan, Filter things to do, Indoor, Outdoor,
-Hidden gems, Places to eat, Places to stay, Rough trip cost (with Who pays
-what), Family additions, version label.
+and vote buttons), Who's traveling, Family vote, Travel dates (trip dates and
+suggested dates), Weather (with packing hints), Trip cost (with Who pays
+what).
+
+**Step 2: Plan the trip.** Places to stay, Filter things to do, Indoor,
+Outdoor, Hidden gems, Places to eat, Our picks, Trip plan (calendar with day
+popups), To-do list, Family additions, version label.
+
+The menu also holds Expand all, Collapse all, Larger text, Print trip
+summary and Download a backup.
 
 ## Shared data (Firestore collections under halfway/{code}/)
 
@@ -90,4 +99,4 @@ what), Family additions, version label.
 (added destinations), `trip` (official travel dates), `dateOpts` (suggested
 date ranges with each family's Works/Maybe/Can't answer), `votes` (one
 document per family, ranked top three cities), `plan` (one document per city
-and day).
+and day), `todos` (task, who's on it, done).

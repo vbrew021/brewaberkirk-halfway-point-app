@@ -10,6 +10,20 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.10.0 (October 8, 2026)
+- Changed: the page is organized into Step 1 (Decide where and when) and
+  Step 2 (Plan the trip). Family vote, Trip cost and Places to stay moved
+  up; Our picks and Trip plan now come after the lists you pick from. The
+  menu is grouped the same way.
+- Changed: "I'm with" (Brew, Aber or Kirk) moved to the top bar and is set
+  once per device.
+- Added: Trip at a glance, a summary of the leading city, dates, typical
+  weather, estimated cost, plan progress and to-dos, with Print trip summary.
+- Added: shared To-do list with who's on each task and a starter list.
+- Added: printable trip summary in large, easy-to-read type.
+- Added: Larger text option and Download a backup in the menu.
+- Needs updated Firebase rules (to-do list).
+
 ## 1.9.0 (October 8, 2026)
 - Added: every section can be collapsed with the Hide/Show button next to its
   title. Sections start expanded; each device remembers what you hide, and
