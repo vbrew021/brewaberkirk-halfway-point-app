@@ -78,12 +78,13 @@ from both, with suggested cities near it.
 ## Page order (top to bottom)
 
 Top bar: menu button, app name (links home), "I'm with" family chooser, How
-this works. Then Our trip, a dashboard with Overview, Trip calendar
-(calendar with day popups) and To-do list (side by side on a computer, tabs
-on a phone), followed by two steps.
+this works. Then two steps.
 
-**Step 1: Decide where and when.** Trip-type toggle, Map, Choose a meeting
-city (with + Add a destination), Getting there (directions or flight cards
+**Step 1: Decide where and when.** A two-column area on a computer (stacked
+on a phone, map first): left has the trip-type toggle, Map and Choose a
+meeting city (with + Add a destination); right has Our trip, a dashboard
+with Overview, Trip calendar (calendar with day popups) and To-do list as
+tabs. Then Getting there (directions or flight cards
 and vote buttons), Who's traveling, Family vote, Travel dates (trip dates and
 suggested dates), Weather (with packing hints), Trip cost (with Who pays
 what).

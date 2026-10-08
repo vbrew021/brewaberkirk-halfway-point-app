@@ -457,22 +457,41 @@ html.big body{zoom:1.15}
 .dash-tabs [role=tab]:focus-visible{outline:3px solid var(--line);outline-offset:-3px}
 .dash-h{font-size:16px;font-weight:800;margin:0 0 4px}
 .dash-panel:not(.active){display:none}
-@media (min-width:900px){
-  .dash-tabs{display:none}
-  .dash{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
-  .dash-panel,.dash-panel:not(.active){display:block}
-  #tabOverview{grid-column:1/-1}
-  #tabCal,#tabTodo{border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--paper)}
-  #tabTodo .todo-add{grid-template-columns:1fr 1fr}
-  #tabTodo .todo-add input{grid-column:1/-1}
+.dash-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dash-head .coll-btn{margin-bottom:4px}
+#tabTodo.is-collapsed .dash-h{margin-bottom:0}
+.todo-mini{margin:4px 0 0}
+@media (min-width:1100px){main{max-width:1280px}}
+.hero{display:grid;grid-template-columns:minmax(0,1fr);gap:0 22px;align-items:start}
+@media (min-width:1000px){.hero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}.hero-right>.summary{margin-top:12px}}
+.hero-left>section:first-of-type{margin-top:12px}
+.hero .toggle-wrap{margin-top:12px}
+#tabCal,#tabTodo,#tabOverview{container-type:inline-size}
+@container (max-width:560px){
+  .pc-dow .long{display:none}.pc-dow .short{display:inline}
+  .pc-day,.pc-day.out{min-height:56px;padding:4px;align-items:center;text-align:center}
+  .pc-top{flex-direction:column;gap:0}
+  .pc-sum{display:none}
+  .pc-dots{display:flex;gap:2px;justify-content:center;font-size:10px;line-height:1}
+  .pc-dots b,.pc-dots em{font-style:normal;font-weight:800;padding:1px 3px;border-radius:4px;background:var(--paper)}
+  .pc-dots u{text-decoration:none}
 }
+@container (max-width:520px){.todo-add{grid-template-columns:1fr 1fr}.todo-add input{grid-column:1/-1}}
+.side-nav li.nav-sub{padding:10px 18px 2px 30px;font-size:12px;font-weight:700;color:var(--muted)}
+.side-nav li.nav-sub~li a[href^="#tab"]{padding-left:30px}
+.brand-short{display:none}
+@media (max-width:620px){.topbar .brand{flex:none;padding:4px 8px}.who-top select{max-width:104px;font-size:14px;padding:6px 4px}.brand-long{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.brand-short{display:inline}}
+#mapTitle{font-size:clamp(24px,3.2vw,34px);line-height:1.15}
+.toggle{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:440px}
+.toggle button+button{border-left:2px solid var(--ink)}
+@media (max-width:420px){.toggle button{padding:9px 10px}.toggle button strong{font-size:14px}}
 </style>
 </head>
 <body>
 <main>
   <header class="topbar">
     <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sideNav" aria-label="Jump to a section"><span></span><span></span><span></span></button>
-    <a class="brand" href="./" title="Back to the top and refresh">BrewAberKirk Halfway Point App</a>
+    <a class="brand" href="./" title="Back to the top and refresh"><span class="brand-long">BrewAberKirk Halfway Point App</span><span class="brand-short" aria-hidden="true">BrewAberKirk</span></a>
     <label class="who-top"><span>I'm with</span><select id="famSel" aria-label="Which family are you with?"><option value="">Choose…</option><option>Brew</option><option>Aber</option><option>Kirk</option></select></label>
     <button type="button" class="btn small help-btn" id="helpBtn" aria-label="How this works"><span class="help-long">How this works</span><span class="help-short" aria-hidden="true">?</span></button>
   </header>
@@ -481,14 +500,14 @@ html.big body{zoom:1.15}
   <nav class="side-nav" id="sideNav" aria-label="Page sections" hidden>
     <p class="nav-head">Jump to</p>
     <ul>
-      <li class="nav-group">Our trip</li>
-      <li><a href="#tabOverview">Overview</a></li>
-      <li><a href="#tabCal">Trip calendar</a></li>
-      <li><a href="#tabTodo">To-do list</a></li>
       <li class="nav-group">Step 1: Decide where and when</li>
       <li><a href="#tripTop">Trip type</a></li>
       <li><a href="#mapSec">Map</a></li>
       <li><a href="#citySec">Choose a meeting city</a></li>
+      <li class="nav-sub">Our trip</li>
+      <li><a href="#tabOverview">Overview</a></li>
+      <li><a href="#tabCal">Trip calendar</a></li>
+      <li><a href="#tabTodo">To-do list</a></li>
       <li><a href="#getThere">Getting there</a></li>
       <li><a href="#setupSec">Who's traveling</a></li>
       <li><a href="#voteSec">Family vote</a></li>
@@ -526,37 +545,9 @@ html.big body{zoom:1.15}
     <p class="hint">Tips: the ☰ button at the top left jumps straight to any section, and the Hide button next to each section title tucks it away until you need it.</p>
     <div class="pick-actions"><button type="button" class="btn primary" id="welcomeClose">Get started</button></div>
   </dialog>
-  <section class="setup summary" id="summarySec" aria-labelledby="sumTitle" aria-live="polite">
-    <h2 id="sumTitle">Our trip</h2>
-    <p class="actsSub sec-help">Your trip dashboard. Overview shows where things stand; tap a tile to jump to that section. In Calendar, tap a day to plan activities, meals and notes. In To-dos, add tasks, choose who's on each one and tick them off when done. On a phone, switch between them with the tabs.</p>
-    <div class="dash-tabs" role="tablist" aria-label="Our trip">
-      <button type="button" role="tab" id="tab-ov" aria-controls="tabOverview" aria-selected="true" data-tab="tabOverview">Overview</button>
-      <button type="button" role="tab" id="tab-cal" aria-controls="tabCal" aria-selected="false" data-tab="tabCal">Calendar</button>
-      <button type="button" role="tab" id="tab-td" aria-controls="tabTodo" aria-selected="false" data-tab="tabTodo">To-dos</button>
-    </div>
-    <div class="dash">
-      <div class="dash-panel active" id="tabOverview" role="tabpanel" aria-labelledby="tab-ov">
-        <div id="sumBody"></div>
-      </div>
-      <div class="dash-panel" id="tabCal" role="tabpanel" aria-labelledby="tab-cal">
-        <h3 class="dash-h" id="planTitle">Trip calendar</h3>
-        <p class="hint" id="planSub"></p>
-    <div class="pick-actions" id="planActions"></div>
-    <div id="planDays" class="plan-cal"></div>
-    <dialog id="dayDlg" aria-labelledby="dayDlgTitle"><div id="dayDlgBody"></div></dialog>
-      </div>
-      <div class="dash-panel" id="tabTodo" role="tabpanel" aria-labelledby="tab-td">
-        <h3 class="dash-h" id="todoTitle">To-do list</h3>
-    <div class="todo-add"><label class="sr" for="todoText">New task</label><input id="todoText" class="txt" maxlength="120" autocomplete="off" placeholder="For example, book the rental">
-      <label class="sr" for="todoWho">Who's on it</label><select id="todoWho" class="txt"><option value="Everyone">Everyone</option><option>Brew</option><option>Aber</option><option>Kirk</option></select>
-      <button type="button" class="btn" id="todoAdd">Add</button></div>
-    <p class="err" id="todoErr" hidden></p>
-    <ul id="todoList" class="todo-list"></ul>
-    <div class="pick-actions"><button type="button" class="btn ghost small" id="todoStarter">Add common tasks</button><button type="button" class="linkbtn" id="todoClearDone">Remove finished tasks</button></div>
-      </div>
-    </div>
-  </section>
   <div class="step-div" id="step1"><span class="step-num">Step 1</span><span class="step-name">Decide where and when</span></div>
+  <div class="hero" id="hero">
+    <div class="hero-left">
   <div class="toggle-wrap" id="tripTop">
     <span class="toggle-label" id="toggleLabel">Show halfway points for</span>
     <div class="toggle" role="group" aria-labelledby="toggleLabel">
@@ -591,6 +582,42 @@ html.big body{zoom:1.15}
     </div>
   </div>
   </section>
+    </div>
+    <div class="hero-right">
+  <section class="setup summary" id="summarySec" aria-labelledby="sumTitle" aria-live="polite">
+    <h2 id="sumTitle">Our trip</h2>
+    <p class="actsSub sec-help">Your trip dashboard. Overview shows where things stand; tap a tile to jump to that section. In Calendar, tap a day to plan activities, meals and notes. In To-dos, add tasks, choose who's on each one and tick them off when done; tap Hide next to To-do list to tuck it away. Switch between them with the tabs.</p>
+    <div class="dash-tabs" role="tablist" aria-label="Our trip">
+      <button type="button" role="tab" id="tab-ov" aria-controls="tabOverview" aria-selected="true" data-tab="tabOverview">Overview</button>
+      <button type="button" role="tab" id="tab-cal" aria-controls="tabCal" aria-selected="false" data-tab="tabCal">Calendar</button>
+      <button type="button" role="tab" id="tab-td" aria-controls="tabTodo" aria-selected="false" data-tab="tabTodo">To-dos</button>
+    </div>
+    <div class="dash">
+      <div class="dash-panel active" id="tabOverview" role="tabpanel" aria-labelledby="tab-ov">
+        <div id="sumBody"></div>
+      </div>
+      <div class="dash-panel" id="tabCal" role="tabpanel" aria-labelledby="tab-cal">
+        <h3 class="dash-h" id="planTitle">Trip calendar</h3>
+        <p class="hint" id="planSub"></p>
+    <div class="pick-actions" id="planActions"></div>
+    <div id="planDays" class="plan-cal"></div>
+    <dialog id="dayDlg" aria-labelledby="dayDlgTitle"><div id="dayDlgBody"></div></dialog>
+      </div>
+      <div class="dash-panel" id="tabTodo" role="tabpanel" aria-labelledby="tab-td">
+        <div class="dash-head"><h3 class="dash-h" id="todoTitle">To-do list</h3><button type="button" class="coll-btn" id="todoTog" aria-controls="todoBody" aria-expanded="true" aria-labelledby="todoTog todoTitle"><span class="coll-txt">Hide</span><span class="chev" aria-hidden="true"></span></button></div>
+        <div id="todoBody">
+    <div class="todo-add"><label class="sr" for="todoText">New task</label><input id="todoText" class="txt" maxlength="120" autocomplete="off" placeholder="For example, book the rental">
+      <label class="sr" for="todoWho">Who's on it</label><select id="todoWho" class="txt"><option value="Everyone">Everyone</option><option>Brew</option><option>Aber</option><option>Kirk</option></select>
+      <button type="button" class="btn" id="todoAdd">Add</button></div>
+    <p class="err" id="todoErr" hidden></p>
+    <ul id="todoList" class="todo-list"></ul>
+    <div class="pick-actions"><button type="button" class="btn ghost small" id="todoStarter">Add common tasks</button><button type="button" class="linkbtn" id="todoClearDone">Remove finished tasks</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+    </div>
+  </div>
   <section class="coll" id="getBox" aria-labelledby="getThere">
   <h2 id="getThere">Getting there</h2>
   <p class="actsSub sec-help">Tap a card to open driving directions or flight searches from each family’s starting point. Below the cards, choose your family’s 1st, 2nd or 3rd choice to vote for this city.</p>
@@ -751,7 +778,7 @@ html.big body{zoom:1.15}
     <div id="manageList"></div>
     <div class="pick-actions"><button type="button" class="btn small" id="backupBtn2">Download a backup of all family data</button></div>
   </section>
-  <p class="version" id="appVersion">Version 1.11.0 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 1.12.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
@@ -1290,7 +1317,7 @@ scrim.onclick=()=>setNav(false);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!nav.hidden){setNav(false);menuBtn.focus();}});
 nav.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;e.preventDefault();
   const t=document.querySelector(a.getAttribute('href'));setNav(false);
-  if(t&&t.classList.contains('dash-panel')&&typeof activateTab==='function')activateTab(t.id);
+  if(t&&t.classList.contains('dash-panel')&&typeof activateTab==='function')activateTab(t.id,false,true);
   if(t){if(t.scrollIntoView)t.scrollIntoView({behavior:'smooth',block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');try{t.focus({preventScroll:true});}catch(err){}}});
 
 /* ---------- travel dates ---------- */
@@ -1791,7 +1818,7 @@ function saveTodo(id,v){todos[id]=v;store.set('bak-todos',todos);renderTodos();r
 function delTodo(id){delete todos[id];store.set('bak-todos',todos);renderTodos();renderSummary();if(LIVE)colOf('todos').doc(id).delete().catch(saveErr);}
 function addTodo(t,who){t=String(t).trim().slice(0,120);if(!t)return false;saveTodo(uid(),{t,who:WHO.includes(who)?who:'Everyone',done:false,by:fam||'',ts:Date.now()});return true;}
 function renderTodos(){
-  const box=$('todoList');if(!box)return;if(typeof tabCounts==='function')try{tabCounts();}catch(e){}
+  const box=$('todoList');if(!box)return;if($('todoMini')&&store.get('bak-todo-collapsed',false))setTodoCollapsed(true);if(typeof tabCounts==='function')try{tabCounts();}catch(e){}
   const list=Object.entries(todos).filter(([i,v])=>v&&v.t).sort((a,b)=>(a[1].done-b[1].done)||(a[1].ts-b[1].ts));
   if(!list.length){box.innerHTML='<li class="empty-note">No tasks yet. Add one above, or tap Add common tasks for a starter list.</li>';return;}
   box.innerHTML=list.map(([id,v])=>`<li class="${v.done?'done':''}"><input type="checkbox" id="td-${esc(id)}" data-tdone="${esc(id)}" ${v.done?'checked':''}><label for="td-${esc(id)}">${esc(v.t)}</label>
@@ -1848,11 +1875,11 @@ function renderSummary(){
     .catch(()=>{const el=$('sumWx');if(el&&tok===sumTok)el.textContent='Not available';});}
 }
 document.addEventListener('click',e=>{const t=e.target.closest('[data-jump]');if(!t)return;const el=document.querySelector(t.dataset.jump);if(!el)return;
-  if(el.classList.contains('dash-panel')){activateTab(el.id,true);const sb=$('summarySec');if(sb&&window.matchMedia&&!window.matchMedia('(min-width: 900px)').matches){const tb=document.querySelector('.dash-tabs');if(tb&&tb.scrollIntoView)tb.scrollIntoView({behavior:'smooth',block:'start'});}else if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});return;}
+  if(el.classList.contains('dash-panel')){activateTab(el.id,true,true);const tb=document.querySelector('.dash-tabs');if(tb&&tb.scrollIntoView)tb.scrollIntoView({behavior:'smooth',block:'nearest'});return;}
   if(el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});});
 /* ---------- Our trip tabs ---------- */
 const TABS=['tabOverview','tabCal','tabTodo'];
-function activateTab(id,focus){if(!TABS.includes(id))id='tabOverview';
+function activateTab(id,focus,fromUser){if(!TABS.includes(id))id='tabOverview';if(fromUser&&id==='tabTodo'&&store.get('bak-todo-collapsed',false))setTodoCollapsed(false);
   TABS.forEach(t=>{const p=$(t);if(p)p.classList.toggle('active',t===id);});
   document.querySelectorAll('.dash-tabs [role=tab]').forEach(b=>{const on=b.dataset.tab===id;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;if(on&&focus&&b.offsetParent)b.focus();});
   store.set('bak-tab',id);}
@@ -1895,12 +1922,18 @@ function backup(){
 }
 $('backupBtn').onclick=()=>{setNav(false);backup();};$('backupBtn2').onclick=backup;
 
+/* ---------- collapsible to-do list ---------- */
+function setTodoCollapsed(c){store.set('bak-todo-collapsed',c);const b=$('todoBody'),t=$('todoTog');if(!b||!t)return;b.hidden=c;t.setAttribute('aria-expanded',c?'false':'true');t.querySelector('.coll-txt').textContent=c?'Show':'Hide';$('tabTodo').classList.toggle('is-collapsed',c);
+  const n=Object.values(todos).filter(v=>v&&v.t&&!v.done).length;let s=$('todoMini');if(!s){s=document.createElement('p');s.id='todoMini';s.className='hint todo-mini';$('tabTodo').appendChild(s);}s.hidden=!c;s.textContent=n?`${n} open task${n>1?'s':''}. Tap Show to see them.`:'No open tasks.';}
+$('todoTog').onclick=()=>setTodoCollapsed(!store.get('bak-todo-collapsed',false));
+setTodoCollapsed(!!store.get('bak-todo-collapsed',false));
+
 /* ---------- collapsible sections ---------- */
 let collapsed=new Set(store.get('bak-collapsed',[]));
 const collSecs=[];
 (function setupCollapsible(){
   const dd=$('dayDlg');if(dd&&dd.parentElement!==document.body)document.body.appendChild(dd);
-  document.querySelectorAll('main > section').forEach(sec=>{
+  document.querySelectorAll('main > section, .hero-left > section, .hero-right > section').forEach(sec=>{
     if(!sec.id)return;
     const hd=sec.querySelector(':scope > h1, :scope > h2, :scope > div > h2');if(!hd)return;
     let head;

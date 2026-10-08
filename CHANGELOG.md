@@ -10,6 +10,21 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.12.0 (October 8, 2026)
+- Changed: the trip toggle, map and city buttons are back at the top, with
+  Our trip beside them on a computer (left: map and cities; right: Our trip
+  with Overview, Calendar and To-dos tabs). On a phone they stack, map
+  first. The page is a little wider on large screens.
+- Changed: the trip calendar and to-dos use tabs on every screen size and
+  fit the narrower column automatically.
+- Improved: on phones, the top bar shows a shorter app name so it isn't cut
+  off, and the driving/flying toggle buttons are equal width.
+
+## 1.11.1 (October 8, 2026)
+- Added: Hide/Show button on the To-do list. When hidden it shows how many
+  tasks are still open; each device remembers the choice, and opening the
+  to-do list from Overview or the menu shows it again.
+
 ## 1.11.0 (October 8, 2026)
 - Changed: Trip at a glance is now Our trip, a dashboard with the overview,
   the trip calendar and the to-do list. On a computer all three show at
