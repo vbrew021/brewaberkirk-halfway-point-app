@@ -10,6 +10,12 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.5.2 (October 8, 2026)
+- Fixed: typical weather now falls back to NASA's free POWER climate data
+  when Open-Meteo can't be reached, and the forecast notes its source.
+- Added: a Details note and a Try again button when weather can't load, to
+  show which weather service was blocked.
+
 ## 1.5.1 (October 8, 2026)
 - Fixed: typical weather often failed to load. It now requests only your
   trip dates for each past year, retries once, and uses the years that load.
