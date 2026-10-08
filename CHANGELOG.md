@@ -10,6 +10,10 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.14.3 (October 8, 2026)
+- Changed: Our trip is back to its full gold border (as before 1.14.1),
+  replacing the top stripe and shadow.
+
 ## 1.14.2 (October 8, 2026)
 - Changed: Our trip stands out as the main dashboard with a gold stripe
   along its top edge and a soft shadow; it otherwise matches the other cards.

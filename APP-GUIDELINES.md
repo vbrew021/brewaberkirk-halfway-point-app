@@ -74,8 +74,8 @@ from both, with suggested cities near it.
 11. **Consistent cards.** Every section uses the same card style (land
     background, 1px border, 14px corners, 18px padding). Don't add one-off
     borders, colored outlines or divider lines to individual sections. The
-    one exception is Our trip, the main dashboard, which has a gold stripe on
-    its top edge and a soft shadow.
+    one exception is Our trip, the main dashboard, which has a full 2px gold
+    border.
 12. **Update everywhere.** Each release updates `index.html`, the Claude
     artifact and `CHANGELOG.md`, and `SETUP.md` when instructions change.
     Remind the user to upload to GitHub and check the version label.
