@@ -10,6 +10,20 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.6.1 (October 8, 2026)
+- Faster weather: each device remembers which weather services work and
+  goes to them first, gives up on an unresponsive service after about 4
+  seconds, shows the forecast as soon as it arrives while typical weather
+  fills in, and saves results on the device (forecast for 3 hours, typical
+  weather for 30 days) so revisiting a city is instant.
+
+## 1.6.0 (October 8, 2026)
+- Added: more named places to stay (now up to 5 per city), including water
+  park resorts, historic hotels and lodges near the parks.
+- Added: ready-made lodging searches for every city (indoor pools, suites
+  that sleep 6, free breakfast, near a top attraction, cabins and lodges),
+  so each city shows 5 to 10 options.
+
 ## 1.5.2 (October 8, 2026)
 - Fixed: typical weather now falls back to NASA's free POWER climate data
   when Open-Meteo can't be reached, and the forecast notes its source.
