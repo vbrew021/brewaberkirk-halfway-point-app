@@ -73,7 +73,8 @@ from both, with suggested cities near it.
 
 Menu button and app name (links home), trip-type toggle, map, Choose a meeting
 city (with + Add a destination), Getting there (directions or flight cards
-and voting), Who's traveling, Travel dates, Weather (with packing hints),
+and voting), Who's traveling, Travel dates (trip dates and suggested dates),
+Weather (with packing hints),
 Family vote, Our picks, Trip plan, Filter things to do, Indoor, Outdoor,
 Hidden gems, Places to eat, Places to stay, Rough trip cost (with Who pays
 what), Family additions, version label.
@@ -81,5 +82,7 @@ what), Family additions, version label.
 ## Shared data (Firestore collections under halfway/{code}/)
 
 `picks`, `custom` (suggestions: sections in, out, gem, eat, stay), `places`
-(added destinations), `trip` (shared travel dates), `votes` (one document per
-family, ranked top three cities), `plan` (one document per city and day).
+(added destinations), `trip` (official travel dates), `dateOpts` (suggested
+date ranges with each family's Works/Maybe/Can't answer), `votes` (one
+document per family, ranked top three cities), `plan` (one document per city
+and day).

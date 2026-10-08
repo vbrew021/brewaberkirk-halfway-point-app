@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Put your family code here, between the single quotes. This is the only line to change.
-    function isFamily(code) { return code == 'BrewAberKirk21'; }
+    function isFamily(code) { return code == 'YOUR-FAMILY-CODE'; }
 
     // Starred picks
     match /halfway/{code}/picks/{pickId} {
@@ -77,6 +77,20 @@ service cloud.firestore {
         && request.resource.data.note is string && request.resource.data.note.size() <= 1000
         && request.resource.data.by is string && request.resource.data.by.size() <= 10
         && request.resource.data.ts is number;
+    }
+
+    // Suggested trip dates and each family's answer (resp: Brew/Aber/Kirk -> yes, maybe or no)
+    match /halfway/{code}/dateOpts/{optId} {
+      allow read, delete: if isFamily(code);
+      allow create, update: if isFamily(code)
+        && request.resource.data.keys().hasOnly(['start', 'end', 'note', 'by', 'ts', 'resp'])
+        && request.resource.data.start is string && request.resource.data.start.size() == 10
+        && request.resource.data.end is string && request.resource.data.end.size() == 10
+        && request.resource.data.note is string && request.resource.data.note.size() <= 150
+        && request.resource.data.by in ['Brew', 'Aber', 'Kirk']
+        && request.resource.data.ts is number
+        && request.resource.data.resp is map
+        && request.resource.data.resp.keys().hasOnly(['Brew', 'Aber', 'Kirk']);
     }
   }
 }

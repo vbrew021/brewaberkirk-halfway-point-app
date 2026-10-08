@@ -10,6 +10,13 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.8.0 (October 8, 2026)
+- Added: Suggested dates in Travel dates. Anyone can suggest a date range
+  with an optional note; each family answers Works, Maybe or Can't; the best
+  option is marked Top choice and shows typical weather for the selected
+  city. Use these dates makes a suggestion the official trip dates.
+- Needs updated Firebase rules (suggested dates).
+
 ## 1.7.2 (October 8, 2026)
 - Added: a short how-to under every section heading explaining what to tap.
 - Added: a Getting there heading above the directions and flight cards
