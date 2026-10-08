@@ -94,13 +94,14 @@ page but grows and shrinks on its own):
   Places to stay, Filter things to do, Indoor, Outdoor, Hidden gems, Places
   to eat.
 - **Right:** Our trip (dashboard with Overview, Trip calendar and To-do list
-  tabs), Family vote (vote buttons for the viewed city and standings), Travel
+  tabs, plus the Trip menu), Family vote (vote buttons for the viewed city and standings), Compare
+  finalists, Travel
   dates (trip dates and suggested dates),
   Weather (with packing hints), Trip cost (with Who pays what), Our picks,
   Family additions.
 
 On a phone everything stacks: toggle, map, cities, Our trip, Getting there,
-Who's traveling, Family vote, dates, weather, cost, then Step 2 (places to
+Who's traveling, Family vote, Compare finalists, dates, weather, cost, then Step 2 (places to
 stay, filters, the four lists, Our picks, Family additions). New sections
 must be placed in one of the two columns and given a phone order.
 
@@ -108,10 +109,24 @@ The menu opens as a sidebar and the page shifts to make room (never
 overlapping the cards). It also holds Expand all, Collapse all, Larger text, Print trip
 summary and Download a backup. The version label sits at the bottom.
 
+## Trips
+
+The family can plan several trips. Trip-level data lives under
+`halfway/{code}/trips/{tripId}/...` and in the browser under keys prefixed
+`bak-t:{tripId}:`. Shared data (family suggestions and added destinations)
+stays under `halfway/{code}/` and is the same for every trip. New features
+must decide whether their data belongs to a trip or is shared, and the
+rules file must cover it in the right place. The trip list is the
+`trips` collection (name, by, ts); the current trip is stored per device in
+`bak-curtrip`. Data saved before 2.0.0 is copied into the trip `main`
+("Our first trip") on first connect and kept read-only.
+
 ## Shared data (Firestore collections under halfway/{code}/)
 
-`picks`, `custom` (suggestions: sections in, out, gem, eat, stay), `places`
-(added destinations), `trip` (official travel dates), `dateOpts` (suggested
+Per trip (under `trips/{tripId}/`): `picks`, `trip` (official travel dates), `dateOpts` (suggested
 date ranges with each family's Works/Maybe/Can't answer), `votes` (one
 document per family, ranked top three cities), `plan` (one document per city
-and day), `todos` (task, who's on it, done).
+and day), `todos` (task, who's on it, done), `party` (document `who`:
+which families are going and whether the Brews' 19-year-old is coming).
+Shared across trips: `custom` (suggestions: sections in, out, gem, eat,
+stay) and `places` (added destinations).

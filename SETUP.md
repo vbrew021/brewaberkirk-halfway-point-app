@@ -107,6 +107,23 @@ weather for those dates in the selected city.
   each city gets a small calendar of your trip. Tap a day to open it, then add activities, plan breakfast, lunch and dinner, mark travel days and add
   notes. **Add to calendar** downloads a file your calendar app can open.
 
+## Version 2: trips
+
+Version 2.0.0 adds multiple trips, which changes where shared data is saved
+in Firebase. To upgrade:
+
+1. Upload the new `index.html` to GitHub.
+2. Open Firestore Database, then Rules. Select everything, delete it, and
+   paste in the whole new `firestore.rules`. Put your family code on the
+   line near the top and click **Publish**.
+3. Open the site and connect as usual. The app copies everything saved so
+   far into a trip called "Our first trip" (rename it from the Trip menu in
+   Our trip). The old copies stay in Firebase, read-only, as a backup.
+
+Use **+ New trip** in Our trip to plan another trip. Each trip has its own
+dates, who's going, votes, picks, calendar and to-dos; family suggestions
+and added destinations are shared by all trips.
+
 ## Updating the app later
 
 When Claude gives you a new version, upload the new `index.html` to the

@@ -10,6 +10,31 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 2.0.0 (October 8, 2026)
+- Added: Trips. Use the Trip menu in Our trip to switch trips, + New trip to
+  start another (optionally with the same families going), Rename, or
+  Delete trip. Each trip has its own dates and suggested dates, who's
+  going, family vote, picks, trip calendar and to-dos. Family suggestions
+  and added destinations are shared across all trips. Printing and backups
+  include the trip name.
+- Added: Compare finalists, a side-by-side table of two or three cities
+  (the vote leaders to start): votes, each family's distance, fairness,
+  estimated cost, typical weather for your dates, picks, days planned and
+  things to do, with the best value in each row marked in green.
+- Changed: shared family data now lives under each trip in Firebase. The
+  first time someone connects, everything saved so far is copied into a
+  trip called "Our first trip" automatically; nothing is lost.
+- Needs updated Firebase rules (major update; replace the whole rules file).
+
+## 1.16.0 (October 8, 2026)
+- Added: turn the Brews, Kirks and Abers on or off in Who's traveling for
+  trips with only part of the family (at least one family stays on). The
+  choice is shared with everyone. Directions, flights, lodging and rental
+  searches, trip cost and Who pays what, the summary, printing and the
+  filters all follow who's going; rooms and Michigan cars adjust
+  automatically. The 19-year-old option appears only when the Brews go.
+- Needs updated Firebase rules (who's going).
+
 ## 1.15.0 (October 8, 2026)
 - Changed: the menu no longer covers the page. On a computer it opens as a
   sidebar and the page shifts right to make room (switching to one column

@@ -489,7 +489,7 @@ html.big body{zoom:1.15}
 @container page (max-width:959.98px){
   .hero{display:flex;flex-direction:column}
   .hero-left,.hero-right{display:contents}
-  #step1{order:0}#tripTop{order:1}#mapSec{order:2}#cityBox{order:3}#summarySec{order:4}#getBox{order:5}#setupSec{order:6}#voteSec{order:7}#datesSec{order:8}#weatherSec{order:9}#costSec{order:10}#step2{order:11}#staySec{order:12}#filterSec{order:13}#inSec{order:14}#outSec{order:15}#gemSec{order:16}#eatSec{order:17}#picksSec{order:18}#manageSec{order:19}
+  #step1{order:0}#tripTop{order:1}#mapSec{order:2}#cityBox{order:3}#summarySec{order:4}#getBox{order:5}#setupSec{order:6}#voteSec{order:7}#compareSec{order:8}#datesSec{order:9}#weatherSec{order:10}#costSec{order:11}#step2{order:12}#staySec{order:13}#filterSec{order:14}#inSec{order:15}#outSec{order:16}#gemSec{order:17}#eatSec{order:18}#picksSec{order:19}#manageSec{order:20}
 }
 .hero-right>section{margin-top:16px}
 .hero-right>section.acts{margin:16px 0 8px;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--land)}
@@ -519,6 +519,32 @@ main{container-type:inline-size;container-name:page;transition:margin .25s ease,
   .nav-scrim{left:min(300px,85vw)}
 }
 @media (prefers-reduced-motion:reduce){main{transition:none}}
+.fam-toggles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:4px 0 12px}
+.setup label.fam-tg{flex-direction:row;font-weight:400;color:var(--ink);font-size:inherit}
+.fam-tg{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid var(--border);border-radius:12px;background:var(--paper);cursor:pointer;min-height:56px}
+.fam-tg input{width:22px;height:22px;flex:none;accent-color:var(--ink)}
+.fam-tg-body{display:flex;flex-direction:column;line-height:1.3}
+.fam-tg-body strong{font-size:16px}
+.fam-tg-body span{font-size:13px;color:var(--muted)}
+.fam-tg:has(input:checked){border-color:var(--ink);background:var(--land)}
+.fam-tg:has(input:checked).fBrew-tg{border-color:#1B4FA0}.fam-tg:has(input:checked).fAber-tg{border-color:#0E6B4F}.fam-tg:has(input:checked).fKirk-tg{border-color:#7A4B9C}
+.fam-tg:not(:has(input:checked)){opacity:.7}
+.fam-tg:not(:has(input:checked)) .fam-tg-body strong{text-decoration:line-through}
+.fam-tg:focus-within{outline:3px solid var(--line);outline-offset:2px}
+label.check.off{opacity:.5}
+.trip-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:2px 0 4px;padding:10px 12px;border-radius:10px;background:var(--paper)}
+.trip-bar label{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.trip-bar select{flex:1 1 180px;font-weight:700;width:auto}
+#tripStatus:empty{display:none}
+.cmp-pick{margin-bottom:10px}
+.cmp-pick .linkbtn{align-self:center}
+table.cmp{border-collapse:collapse;width:100%;font-size:15px}
+.cmp th,.cmp td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.cmp thead th{font-size:15px;font-weight:800;white-space:nowrap}
+.cmp tbody th{font-size:13px;font-weight:700;color:var(--muted);min-width:110px}
+.cmp td{white-space:nowrap}
+.cmp td.best{background:color-mix(in srgb,var(--tx) 16%,transparent);font-weight:800;color:var(--ink)}
+.cmp td.best::after{content:" \2713";color:var(--tx)}
 </style>
 </head>
 <body>
@@ -545,6 +571,7 @@ main{container-type:inline-size;container-name:page;transition:margin .25s ease,
       <li><a href="#getThere">Getting there</a></li>
       <li><a href="#setupSec">Who's traveling</a></li>
       <li><a href="#voteSec">Family vote</a></li>
+      <li><a href="#compareSec">Compare finalists</a></li>
       <li><a href="#datesSec">Travel dates</a></li>
       <li><a href="#weatherSec">Weather</a></li>
       <li><a href="#costSec">Trip cost</a></li>
@@ -624,15 +651,21 @@ main{container-type:inline-size;container-name:page;transition:margin .25s ease,
   </section>
   <section class="setup" id="setupSec" aria-labelledby="setupTitle">
     <h2 id="setupTitle">Who's traveling</h2>
-    <p class="actsSub sec-help">Choose where each group starts and whether the Brews’ 19-year-old is coming. This sets the directions, flights, lodging searches and trip cost.</p>
+    <p class="actsSub sec-help">Turn each family on or off for this trip, choose where each group starts and whether the Brews’ 19-year-old is coming. This is shared with everyone and sets the directions, flights, lodging searches, trip cost (rooms and cars adjust automatically) and filters.</p>
+    <div class="fam-toggles" role="group" aria-label="Families on this trip">
+      <label class="fam-tg fBrew-tg"><input type="checkbox" id="wBrew" checked><span class="fam-tg-body"><strong>Brews</strong><span>2 adults, kids 10 and 8</span></span></label>
+      <label class="fam-tg fKirk-tg"><input type="checkbox" id="wKirk" checked><span class="fam-tg-body"><strong>Kirks</strong><span>2 adults (the grandparents)</span></span></label>
+      <label class="fam-tg fAber-tg"><input type="checkbox" id="wAber" checked><span class="fam-tg-body"><strong>Abers</strong><span>2 adults, child 5</span></span></label>
+    </div>
+    <p class="err" id="whoMsg" hidden></p>
     <div class="setup-grid">
-      <label>Brew &amp; Kirk start from
+      <label id="miFromLbl"><span id="miFromTxt">Brew &amp; Kirk start from</span>
         <select id="miFrom"><option value="sl">Spring Lake</option><option value="gr">Grand Rapids</option><option value="det">Detroit</option></select>
       </label>
-      <label>Aber starts from
+      <label id="txFromLbl">Aber starts from
         <select id="txFrom"><option value="an">Andice</option><option value="aus">Austin</option></select>
       </label>
-      <label class="check"><input type="checkbox" id="adultKid"> The Brews' 19-year-old is coming</label>
+      <label class="check" id="adultKidLbl"><input type="checkbox" id="adultKid"> The Brews' 19-year-old is coming</label>
     </div>
     <p class="party" id="party"></p>
   </section>
@@ -683,7 +716,15 @@ main{container-type:inline-size;container-name:page;transition:margin .25s ease,
     <div class="hero-right">
   <section class="setup summary" id="summarySec" aria-labelledby="sumTitle" aria-live="polite">
     <h2 id="sumTitle">Our trip</h2>
-    <p class="actsSub sec-help">Your trip dashboard. Overview shows where things stand; tap a tile to jump to that section. In Calendar, tap a day to plan activities, meals and notes. In To-dos, add tasks, choose who's on each one and tick them off when done; tap Hide next to To-do list to tuck it away. Switch between them with the tabs.</p>
+    <p class="actsSub sec-help">Pick a trip from the Trip menu or tap + New trip to plan another; each trip keeps its own dates, who’s going, votes, picks, calendar and to-dos. Overview shows where things stand (tap a tile to jump there), Calendar is for planning each day, and To-dos holds shared tasks. Switch between them with the tabs.</p>
+    <div class="trip-bar">
+      <label for="tripSel">Trip</label><select id="tripSel" class="txt"></select>
+      <button type="button" class="btn small" id="tripNew">+ New trip</button>
+      <button type="button" class="linkbtn" id="tripRename">Rename</button>
+      <button type="button" class="linkbtn" id="tripDel">Delete trip</button>
+    </div>
+    <p class="hint" id="tripStatus"></p>
+    <div id="tripForm" class="add-form" hidden></div>
     <div class="dash-tabs" role="tablist" aria-label="Our trip">
       <button type="button" role="tab" id="tab-ov" aria-controls="tabOverview" aria-selected="true" data-tab="tabOverview">Overview</button>
       <button type="button" role="tab" id="tab-cal" aria-controls="tabCal" aria-selected="false" data-tab="tabCal">Calendar</button>
@@ -719,6 +760,13 @@ main{container-type:inline-size;container-name:page;transition:margin .25s ease,
     <div id="voteCtl" class="vote-ctl"></div>
     <h3 class="sub-h">Standings</h3>
     <div id="voteBody"></div>
+  </section>
+  <section class="setup" id="compareSec" aria-labelledby="cmpTitle" aria-live="polite">
+    <h2 id="cmpTitle">Compare finalists</h2>
+    <p class="actsSub sec-help">Tap two or three cities to compare them side by side; the family vote's leaders are picked to start. Rows show votes, how far each family travels, how even the trip is, estimated cost, typical weather for your dates and how much is planned. Green marks the best value in each row; tap View to open a city.</p>
+    <div class="chips cmp-pick" id="cmpPick"></div>
+    <p class="err" id="cmpMsg" hidden></p>
+    <div id="cmpBody"></div>
   </section>
   <section class="setup" id="datesSec" aria-labelledby="datesTitle">
     <h2 id="datesTitle">Travel dates</h2>
@@ -814,7 +862,7 @@ main{container-type:inline-size;container-name:page;transition:margin .25s ease,
   </dialog>
 
 
-  <p class="version" id="appVersion">Version 1.15.0 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 2.0.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
@@ -864,7 +912,14 @@ const PAIRS={
 const AIRPORTS={"Seattle, WA":['SEA','Seattle-Tacoma International',47.4502,-122.3088],"Spokane, WA":['GEG','Spokane International',47.6199,-117.5338],"Butte, MT":['BTM','Bert Mooney',45.9548,-112.4975],"Kearney, NE":['EAR','Kearney Regional',40.727,-99.0068],"Topeka, KS":['MCI','Kansas City International',39.2976,-94.7139],"Springfield, MO":['SGF','Springfield-Branson National',37.2457,-93.3886],"Memphis, TN":['MEM','Memphis International',35.0424,-89.9767],"Columbus, GA":['CSG','Columbus Airport',32.5163,-84.9389],"Valdosta, GA":['VLD','Valdosta Regional',30.7825,-83.2767],"Jacksonville, FL":['JAX','Jacksonville International',30.4941,-81.6879]};
 PAIRS.fly.cities.forEach(c=>AIRPORTS[c[6]]=c[7]);
 const STATES={Alabama:'AL',Alaska:'AK',Arizona:'AZ',Arkansas:'AR',California:'CA',Colorado:'CO',Connecticut:'CT',Delaware:'DE','District of Columbia':'DC',Florida:'FL',Georgia:'GA',Hawaii:'HI',Idaho:'ID',Illinois:'IL',Indiana:'IN',Iowa:'IA',Kansas:'KS',Kentucky:'KY',Louisiana:'LA',Maine:'ME',Maryland:'MD',Massachusetts:'MA',Michigan:'MI',Minnesota:'MN',Mississippi:'MS',Missouri:'MO',Montana:'MT',Nebraska:'NE',Nevada:'NV','New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',Ohio:'OH',Oklahoma:'OK',Oregon:'OR',Pennsylvania:'PA','Rhode Island':'RI','South Carolina':'SC','South Dakota':'SD',Tennessee:'TN',Texas:'TX',Utah:'UT',Vermont:'VT',Virginia:'VA',Washington:'WA','West Virginia':'WV',Wisconsin:'WI',Wyoming:'WY'};
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const TRIPKEYS=new Set(['bak-picks','bak-trip','bak-dateopts','bak-votes','bak-plan','bak-todos','bak-who','bak-compare']);
+let curTrip='main';try{const ct=localStorage.getItem('bak-curtrip');if(ct)curTrip=JSON.parse(ct)||'main';}catch(e){}
+try{if(!localStorage.getItem('bak-trips')){localStorage.setItem('bak-trips',JSON.stringify({main:{name:'Our first trip',by:'',ts:Date.now()}}));
+  TRIPKEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!=null&&localStorage.getItem('bak-t:main:'+k)==null)localStorage.setItem('bak-t:main:'+k,v);});}}catch(e){}
+const tk=k=>TRIPKEYS.has(k)?'bak-t:'+curTrip+':'+k:k;
+const store={get(k,d){try{const v=localStorage.getItem(tk(k));return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(tk(k),JSON.stringify(v))}catch(e){}}};
+let trips=store.get('bak-trips',{main:{name:'Our first trip',by:'',ts:0}});
+if(!trips[curTrip]){curTrip=Object.keys(trips)[0]||'main';store.set('bak-curtrip',curTrip);}
 const DEF={gas:3.5,mpg:24,carsMi:2,carsTx:1,nights:3,rooms:3,rate:180};
 let S=Object.assign({},DEF,store.get('bak-settings',{}));
 let picks=store.get('bak-picks',{}),customs=store.get('bak-custom',{}),places=store.get('bak-places',{});
@@ -892,9 +947,27 @@ const money=n=>'$'+Math.round(n).toLocaleString();
 const chipsEl=$('chips'),panel=$('panel');
 let P,pairKey,segG,dots,CITIES=[],city,WX_READY=false;
 const isCustom=c=>!!c[8];
-const party=()=>{const x=$('adultKid').checked?1:0;return{mi:6+x,tx:3,adults:6+x,kids:3}};
+let who=Object.assign({Brew:true,Aber:true,Kirk:true,adult19:!!store.get('bak-19',false)},store.get('bak-who',{}));
+const party=()=>{const x=who.Brew&&who.adult19?1:0,brew=who.Brew?4+x:0,kirk=who.Kirk?2:0,aber=who.Aber?3:0;
+  const miLabel=who.Brew&&who.Kirk?'Brew & Kirk':who.Brew?'Brew':who.Kirk?'Kirk':'';
+  return{mi:brew+kirk,tx:aber,brew,kirk,aber,adults:(who.Brew?2+x:0)+(who.Kirk?2:0)+(who.Aber?2:0),kids:(who.Brew?2:0)+(who.Aber?1:0),miLabel,
+    fams:['Brew','Aber','Kirk'].filter(f=>who[f])};};
 function setParty(){const p=party();
-  $('party').textContent=`Brew & Kirk: ${p.mi} people (${$('adultKid').checked?'5':'4'} Brews and 2 Kirks). Aber: 3 people. Everyone together: ${p.mi+p.tx}, including kids 10, 8 and 5.`;}
+  ['Brew','Aber','Kirk'].forEach(f=>{const c=$('w'+f);if(c)c.checked=!!who[f];});
+  $('adultKid').checked=!!who.adult19;$('adultKid').disabled=!who.Brew;$('adultKidLbl').classList.toggle('off',!who.Brew);
+  $('miFromLbl').hidden=!p.mi;$('txFromLbl').hidden=!p.tx;$('miFromTxt').textContent=(p.miLabel||'Brew & Kirk')+(p.miLabel==='Brew & Kirk'?' start from':' starts from');
+  const parts=[];if(who.Brew)parts.push(`${p.brew} Brews`);if(who.Kirk)parts.push('2 Kirks');if(who.Aber)parts.push('3 Abers');
+  const kids=[];if(who.Brew)kids.push('10','8');if(who.Aber)kids.push('5');
+  $('party').textContent=`On this trip: ${parts.join(', ').replace(/, ([^,]*)$/,' and $1')}. ${p.mi+p.tx} people${kids.length?`, including kid${kids.length>1?'s':''} ${kids.join(', ').replace(/, ([^,]*)$/,' and $1')}`:''}.`;
+  document.querySelectorAll('#filters [data-f]').forEach(b=>{const f=b.dataset.f,show=f==='L'?who.Aber:f==='G'?who.Kirk:f==='T'?(who.Brew&&who.adult19):true;b.hidden=!show;if(!show&&filters.has(f)){filters.delete(f);b.setAttribute('aria-pressed','false');}});
+}
+function setWho(nw,fromRemote){const before=who;who=Object.assign({},who,nw);
+  {const cnt=x=>['Brew','Aber','Kirk'].filter(f=>x[f]).length,mic=x=>(x.Brew?1:0)+(x.Kirk?1:0);
+   if(cnt(before)!==cnt(who)&&S.rooms===cnt(before)){S.rooms=Math.max(1,cnt(who));}
+   if(mic(before)!==mic(who)&&S.carsMi===Math.max(1,mic(before))){S.carsMi=Math.max(1,mic(who));}
+   store.set('bak-settings',S);['rooms','carsMi'].forEach(k=>{const el=$(k);if(el)el.value=S[k];});}store.set('bak-who',who);store.set('bak-19',!!who.adult19);setParty();
+  if(city){renderPanel();renderLists();renderCost();}
+  if(!fromRemote&&LIVE)colOf('party').doc('who').set({Brew:!!who.Brew,Aber:!!who.Aber,Kirk:!!who.Kirk,adult19:!!who.adult19,by:fam||'',ts:Date.now()}).catch(saveErr);}
 function customCities(){
   const have=new Set(P.cities.map(c=>c[6]));
   return Object.entries(places).filter(([id,p])=>p&&typeof p.lat==='number'&&!have.has(p.name+', '+p.st))
@@ -953,12 +1026,13 @@ function renderPanel(){
   const {mi,tx}=originTexts(),c=city,T=[c[1],c[2]],ap=AIRPORTS[c[6]];
   let h='';
   if(P.mode==='drive'){
-    h=card(`Brew &amp; Kirk from ${mi.n}`,esc(c[6]),dist(mi.ll,T).toLocaleString()+' miles straight-line',gm(mi.n,c[6]),'Open driving directions','var(--mi)')
-     +card(`Aber from ${tx.n}`,esc(c[6]),dist(tx.ll,T).toLocaleString()+' miles straight-line',gm(tx.n,c[6]),'Open driving directions','var(--tx)');
+    const pp=party();
+    h=(pp.mi?card(`${esc(pp.miLabel)} from ${mi.n}`,esc(c[6]),dist(mi.ll,T).toLocaleString()+' miles straight-line',gm(mi.n,c[6]),'Open driving directions','var(--mi)'):'')
+     +(pp.tx?card(`Aber from ${tx.n}`,esc(c[6]),dist(tx.ll,T).toLocaleString()+' miles straight-line',gm(tx.n,c[6]),'Open driving directions','var(--tx)'):'');
   }else{
     const f=(o,col)=>ap?card(`From ${o.ap[0]} \u00b7 ${o.ap[1]}`,`${ap[0]} \u00b7 ${esc(ap[1])}`,dist([o.ap[2],o.ap[3]],[ap[2],ap[3]]).toLocaleString()+' miles between airports',gf(o.ap[0],ap[0]),'Search nonstop flights',col)
       :card(`From ${o.ap[0]} \u00b7 ${o.ap[1]}`,esc(c[6]),dist([o.ap[2],o.ap[3]],T).toLocaleString()+' miles straight-line; Google Flights suggests the nearest airports',gf(o.ap[0],c[6]),'Search nonstop flights',col);
-    h=f(mi,'var(--mi)')+f(tx,'var(--tx)');
+    const pp=party();h=(pp.mi?f(mi,'var(--mi)'):'')+(pp.tx?f(tx,'var(--tx)'):'');
   }
   if(isCustom(c)){const p=places[c[8]]||{};
     h+=`<div class="custom-note"><span>Added by ${esc(p.by||'the family')}. Distances are from the city center.</span><button type="button" class="linkbtn" id="removeDest">Remove ${esc(c[0])} from the map</button></div>`;}
@@ -1031,10 +1105,10 @@ function renderLists(){
     ||`<li class="empty">No suggestions yet for ${esc(c[0])}. Add one below, or <a href="${gs('family friendly restaurants in '+cn)}" target="_blank" rel="noopener">look for ideas</a>.</li>`;
   const p=party();
   $('stayTitle').textContent=SECS.stay[2]+c[0];
-  $('staySub').textContent=`Named places first, then searches (marked with a magnifying glass) that open current prices and availability. Tap \u2606 to add a named place to Our picks. Rental searches are set up for ${p.adults} adults and 3 kids, and a big rental can keep everyone under one roof.`;
+  $('staySub').textContent=`Named places first, then searches (marked with a magnifying glass) that open current prices and availability. Tap \u2606 to add a named place to Our picks. Rental searches are set up for ${p.adults} adults and ${p.kids} kid${p.kids===1?'':'s'}, and a big rental can keep everyone under one roof.`;
   const q=encodeURIComponent(cn);
-  $('stayLinks').innerHTML=`<a class="btn" target="_blank" rel="noopener" href="https://www.vrbo.com/search?destination=${q}&adults=${p.adults+3}">Vrbo rentals</a>
-   <a class="btn" target="_blank" rel="noopener" href="https://www.airbnb.com/s/${q}/homes?adults=${p.adults}&children=3">Airbnb rentals</a>`;
+  $('stayLinks').innerHTML=`<a class="btn" target="_blank" rel="noopener" href="https://www.vrbo.com/search?destination=${q}&adults=${p.adults+p.kids}">Vrbo rentals</a>
+   <a class="btn" target="_blank" rel="noopener" href="https://www.airbnb.com/s/${q}/homes?adults=${p.adults}&children=${p.kids}">Airbnb rentals</a>`;
   const cs=customsFor(cn,'stay'),named=LODGE[cn]||[];
   const near=(d.in&&d.in[0]&&d.in[0][0])||(d.out&&d.out[0]&&d.out[0][0])||'';
   const gh=s=>'https://www.google.com/travel/hotels?q='+encodeURIComponent(s);
@@ -1080,22 +1154,25 @@ function renderCost(){
     return `<div class="cost-card" style="--c:${col}"><div class="from">${name}, ${n} people</div>
      <div class="cost-line"><span>Drive \u2248${Math.round(road(o)).toLocaleString()} mi round trip, ${cars} car${cars>1?'s':''}</span><strong>${money(g)} gas</strong></div>
      <div class="cost-line"><span>Fly ${o.ap[0]} to ${esc(dest)}</span><strong>${f==null?'Enter a fare':money(f)}</strong></div></div>`;};
-  $('costGrid').innerHTML=row('Brew & Kirk','var(--mi)',mi,S.carsMi,fk,p.mi)+row('Aber','var(--tx)',tx,S.carsTx,fk2,p.tx)
-   +`<div class="cost-card" style="--c:var(--line-ink)"><div class="from">Lodging for everyone</div><div class="cost-line"><span>${S.rooms} room${S.rooms>1?'s':''} \u00d7 ${S.nights} night${S.nights==1?'':'s'} at ${money(S.rate)}</span><strong>${money(lodging)}</strong></div></div>`;
+  $('fareMi').closest('label').hidden=!p.mi;$('fareTx').closest('label').hidden=!p.tx;
+  $('costGrid').innerHTML=(p.mi?row(p.miLabel,'var(--mi)',mi,S.carsMi,fk,p.mi):'')+(p.tx?row('Aber','var(--tx)',tx,S.carsTx,fk2,p.tx):'')
+   +`<div class="cost-card" style="--c:var(--line-ink)"><div class="from">Lodging for the group</div><div class="cost-line"><span>${S.rooms} room${S.rooms>1?'s':''} \u00d7 ${S.nights} night${S.nights==1?'':'s'} at ${money(S.rate)}</span><strong>${money(lodging)}</strong></div></div>`;
   if(WX_READY)renderSplit();
 }
 function select(i){if(!CITIES[i])i=0;if(WX_READY&&openDay){openDay=null;if(dayDlg.close)dayDlg.close();}city=CITIES[i];
   dots.selectAll('.dot').each(function(){const el=d3.select(this);const ci=CITIES[+this.getAttribute('class').split('dot')[2]];el.attr('r',ci&&isCustom(ci)?8:5).attr('fill',ci&&isCustom(ci)?'var(--land)':'var(--ink)');});
   dots.select('.dot'+i).attr('r',isCustom(city)?10:8).attr('fill',isCustom(city)?'var(--custom-soft)':'var(--line-ink)');
   [...chipsEl.children].forEach((b,j)=>b.setAttribute('aria-pressed',j===i?'true':'false'));
-  renderPanel();renderLists();renderPicks();renderCost();renderManage();if(WX_READY){renderWeather();renderVotes();renderPlan();renderDateOpts();renderSummary();}
+  renderPanel();renderLists();renderPicks();renderCost();renderManage();if(WX_READY){renderWeather();renderVotes();renderPlan();renderDateOpts();renderSummary();renderCompare();}
 }
 const rerender=()=>{if(city){renderLists();renderPicks();renderManage();}};
 
 /* ---------- storage: live (Firebase) or this device ---------- */
 let LIVE=false,code=store.get('bak-code',''),db=null,unsubs=[];
 const FBV='10.14.1';
-const colOf=name=>db.collection('halfway').doc(code).collection(name);
+const TRIPCOLL=['picks','trip','dateOpts','votes','plan','todos','party'];
+const tripsCol=c=>db.collection('halfway').doc(c).collection('trips');
+const colOf=name=>TRIPCOLL.includes(name)?tripsCol(code).doc(curTrip).collection(name):db.collection('halfway').doc(code).collection(name);
 function persistLocal(){store.set('bak-picks',picks);store.set('bak-custom',customs);store.set('bak-places',places);}
 function writePick(c,n,w,fam,on){
   if(!LIVE)return;
@@ -1112,8 +1189,10 @@ function saveErr(e){if(e&&e.code==='permission-denied')setLive('The family list 
 /* ---------- star, family, filters ---------- */
 document.querySelectorAll('.toggle button').forEach(b=>b.onclick=()=>drawPair(b.dataset.pair,null,true));
 ['miFrom','txFrom'].forEach(id=>$(id).onchange=()=>{renderPanel();renderCost();});
-$('adultKid').checked=!!store.get('bak-19',false);
-$('adultKid').onchange=()=>{store.set('bak-19',$('adultKid').checked);setParty();renderLists();renderCost();};
+$('adultKid').onchange=()=>setWho({adult19:$('adultKid').checked});
+['Brew','Aber','Kirk'].forEach(f=>{$('w'+f).onchange=()=>{const on=$('w'+f).checked;const others=['Brew','Aber','Kirk'].filter(x=>x!==f&&who[x]);
+  if(!on&&!others.length){$('w'+f).checked=true;$('whoMsg').hidden=false;$('whoMsg').textContent='At least one family needs to be on the trip.';return;}
+  $('whoMsg').hidden=true;setWho({[f]:on});};});
 
 document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{const f=b.dataset.f;filters.has(f)?filters.delete(f):filters.add(f);b.setAttribute('aria-pressed',filters.has(f));renderLists();});
 function needFam(errEl,retry){if(fam)return true;errEl.hidden=false;errEl.innerHTML=famButtons('Which family is adding this?',retry);return false;}
@@ -1272,11 +1351,29 @@ function setLive(msg){$('liveStatus').hidden=false;$('liveStatus').textContent=m
 function syncErr(){setLive('Can\u2019t reach the family list right now. Changes on this device will sync when you\u2019re back online.');}
 const CODE_HELP='That code didn\u2019t match. Codes must match the one in your Firebase rules exactly, including spaces and capital letters. Tap Show to check for typos.';
 function showCode(msg){$('famCodeBtn').disabled=false;$('codeErr').className='err';LIVE=false;unsubs.forEach(u=>u());unsubs=[];$('syncBox').hidden=false;$('liveStatus').hidden=true;$('codeErr').hidden=!msg;$('codeErr').textContent=msg||'';$('sharePicks').hidden=false;}
+async function prepTrips(c){
+  const snap=await tripsCol(c).get();const list={};snap.forEach(d=>{list[d.id]=d.data();});
+  if(!Object.keys(list).length){
+    const now=Date.now(),first=(trips.main&&trips.main.name)||'Our first trip';
+    await tripsCol(c).doc('main').set({name:first,by:fam||'',ts:now});list.main={name:first,by:fam||'',ts:now};
+    for(const coll of TRIPCOLL){try{const s=await db.collection('halfway').doc(c).collection(coll).get();const ps=[];s.forEach(doc=>ps.push(tripsCol(c).doc('main').collection(coll).doc(doc.id).set(doc.data()).catch(()=>{})));await Promise.all(ps);}catch(e){}}
+  }
+  for(const [id,v] of Object.entries(trips)){if(!list[id]&&v&&v.name){const x={name:String(v.name).slice(0,60),by:v.by||'',ts:v.ts||Date.now()};list[id]=x;tripsCol(c).doc(id).set(x).catch(()=>{});}}
+  return list;
+}
 function connect(c,fromBtn,onFail){
   unsubs.forEach(u=>u());unsubs=[];
   const prevCode=code;code=c;
+  prepTrips(c).then(list=>{trips=list;store.set('bak-trips',trips);
+    if(!trips[curTrip]){curTrip=Object.keys(trips).sort((a,b)=>(trips[a].ts||0)-(trips[b].ts||0))[0];store.set('bak-curtrip',curTrip);store.set('bak-code',c);location.reload();return;}
+    renderTrips();connectTrip(c,fromBtn,onFail,prevCode);})
+  .catch(err=>{if(err&&err.code==='permission-denied'){if(onFail){onFail();return;}code=prevCode&&!fromBtn?prevCode:code;showCode(fromBtn||prevCode?CODE_HELP:'');}else syncErr();});
+}
+function connectTrip(c,fromBtn,onFail,prevCode){
   let first=true;
-  const u1=db.collection('halfway').doc(c).collection('picks').onSnapshot({includeMetadataChanges:true},snap=>{
+  unsubs.push(tripsCol(c).onSnapshot(snap=>{const list={};snap.forEach(d=>{list[d.id]=d.data();});if(!Object.keys(list).length)return;
+    trips=list;store.set('bak-trips',trips);if(!trips[curTrip]){curTrip=Object.keys(trips)[0];store.set('bak-curtrip',curTrip);location.reload();return;}renderTrips();},()=>{}));
+  const u1=tripsCol(c).doc(curTrip).collection('picks').onSnapshot({includeMetadataChanges:true},snap=>{
     const d={};snap.forEach(doc=>{const v=doc.data();if(v&&Array.isArray(v.f)&&v.f.length)d[v.c+'|'+v.n]={c:v.c,n:v.n,w:v.w||'',f:v.f.slice()};});
     if(first){if(snap.metadata.fromCache)return;first=false;store.set('bak-code',c);LIVE=true;$('famCodeBtn').disabled=false;$('codeErr').hidden=true;$('syncBox').hidden=true;$('sharePicks').hidden=true;$('famCode').value='';
       const local=store.get('bak-picks',{});
@@ -1290,6 +1387,10 @@ function connect(c,fromBtn,onFail){
 }
 function subscribeExtras(){
   const localC=store.get('bak-custom',{}),localP=store.get('bak-places',{}),localV=store.get('bak-votes',{}),localPl=store.get('bak-plan',{});
+  let firstWho=true;
+  unsubs.push(colOf('party').doc('who').onSnapshot(doc=>{const v=doc.exists?doc.data():null;
+    if(firstWho){firstWho=false;if(!v){colOf('party').doc('who').set({Brew:!!who.Brew,Aber:!!who.Aber,Kirk:!!who.Kirk,adult19:!!who.adult19,by:fam||'',ts:Date.now()}).catch(saveErr);return;}}
+    if(v)setWho({Brew:!!v.Brew,Aber:!!v.Aber,Kirk:!!v.Kirk,adult19:!!v.adult19},true);},err=>saveErr(err)));
   let firstTd=true;const localTd=store.get('bak-todos',{});
   unsubs.push(colOf('todos').onSnapshot(snap=>{const d={};snap.forEach(doc=>{d[doc.id]=doc.data();});
     if(firstTd){firstTd=false;Object.entries(localTd).forEach(([id,v])=>{if(!d[id]&&v&&v.t){d[id]=v;colOf('todos').doc(id).set({t:v.t,who:v.who||'Everyone',done:!!v.done,by:v.by||'',ts:v.ts||Date.now()}).catch(saveErr);}});}
@@ -1300,7 +1401,7 @@ function subscribeExtras(){
     dateOpts=d;store.set('bak-dateopts',dateOpts);const a=document.activeElement;if(!(a&&a.id==='propNote'))renderDateOpts();renderSummary();},err=>saveErr(err)));
   unsubs.push(colOf('votes').onSnapshot(snap=>{const d={};snap.forEach(doc=>{d[doc.id]=doc.data();});
     if(firstV){firstV=false;Object.entries(localV).forEach(([f,v])=>{if(!d[f]&&v&&FAMS.includes(f)){d[f]=v;colOf('votes').doc(f).set({r:v.r,by:f,ts:v.ts||Date.now()}).catch(saveErr);}});}
-    votes=d;store.set('bak-votes',votes);if(city){renderVotes();renderVoteCtl();renderSummary();}},err=>saveErr(err)));
+    votes=d;store.set('bak-votes',votes);if(city){renderVotes();renderVoteCtl();renderSummary();renderCompare();}},err=>saveErr(err)));
   unsubs.push(colOf('plan').onSnapshot(snap=>{const d={};snap.forEach(doc=>{d[doc.id]=doc.data();});
     if(firstPl){firstPl=false;Object.entries(localPl).forEach(([id,v])=>{if(!d[id]&&v){d[id]=v;colOf('plan').doc(id).set({city:v.city,date:v.date,travel:v.travel||'',acts:v.acts||[],b:v.b||{t:'',n:''},l:v.l||{t:'',n:''},dn:v.dn||{t:'',n:''},note:v.note||'',by:v.by||'',ts:v.ts||Date.now()}).catch(saveErr);}});}
     plan=d;store.set('bak-plan',plan);const a=document.activeElement;if(city&&!(a&&(a.matches('[data-note]')||(a.closest&&a.closest('.editing,.add-act')))))renderPlan();},err=>saveErr(err)));
@@ -1379,7 +1480,7 @@ function renderDates(){
 function setTrip(t,fromRemote){
   trip={start:t.start||'',end:t.end||'',by:t.by||'',ts:t.ts||Date.now()};store.set('bak-trip',trip);
   if(trip.start&&trip.end){const n=daysBetween(trip.start,trip.end);if(n>=0){S.nights=n;store.set('bak-settings',S);$('nights').value=n;}}
-  renderDates();if(city){renderCost();renderWeather();if(WX_READY){renderPlan();renderDateOpts();renderSummary();}}
+  renderDates();if(city){renderCost();renderWeather();if(WX_READY){renderPlan();renderDateOpts();renderSummary();renderCompare();}}
   if(!fromRemote&&LIVE)colOf('trip').doc('dates').set({start:trip.start,end:trip.end,by:fam||'',ts:trip.ts}).catch(saveErr);
 }
 const cal=$('cal');let calWhich='start',calView=new Date(),draft={start:'',end:''},calMode='trip';
@@ -1562,7 +1663,7 @@ function setVote(rankIdx){
   const cur=r.indexOf(k);
   if(cur===rankIdx){r[rankIdx]='';}else{if(cur>=0)r[cur]='';r[rankIdx]=k;}
   votes[fam]={r,by:fam,ts:Date.now()};store.set('bak-votes',votes);
-  renderVoteCtl();renderVotes();renderSummary();
+  renderVoteCtl();renderVotes();renderSummary();renderCompare();
   if(LIVE)colOf('votes').doc(fam).set(votes[fam]).catch(saveErr);
 }
 function renderVoteCtl(){
@@ -1736,24 +1837,26 @@ function renderSplit(){
   const mode=P&&P.mode==='fly'?'fly':'drive';
   const miMode=S.miMode||mode,txMode=S.txMode||mode,ls=S.lodgeSplit||'family';
   document.querySelectorAll('.split-ctl [data-k]').forEach(b=>b.setAttribute('aria-pressed',({miMode,txMode,lodgeSplit:ls})[b.dataset.k]===b.dataset.v?'true':'false'));
+  {const pq=party();const g=document.querySelectorAll('.split-ctl .seg');if(g[0])g[0].hidden=!pq.mi;if(g[1])g[1].hidden=!pq.tx;const sp=g[0]&&g[0].querySelector('span');if(sp)sp.textContent=pq.miLabel||'Brew & Kirk';}
   const {mi,tx}=originTexts(),c=city,T=[c[1],c[2]],ap=AIRPORTS[c[6]];
-  const brew=4+($('adultKid').checked?1:0),kirk=2,aber=3,all=brew+kirk+aber;
+  const pp=party(),brew=pp.brew,kirk=pp.kirk,aber=pp.aber,all=brew+kirk+aber,act=pp.fams;
   const road=o=>dist(o.ll,T)*1.2*2,gas=(o,cars)=>road(o)/S.mpg*S.gas*cars;
   const fMi=fares[c[6]+'|'+mi.ap[0]],fTx=fares[c[6]+'|'+tx.ap[0]];
   let missing=false;
   const miGas=gas(mi,S.carsMi);
-  const travel={Brew:miMode==='drive'?miGas*brew/(brew+kirk):(fMi?fMi*brew:(missing=true,null)),
-                Kirk:miMode==='drive'?miGas*kirk/(brew+kirk):(fMi?fMi*kirk:(missing=true,null)),
-                Aber:txMode==='drive'?gas(tx,S.carsTx):(fTx?fTx*aber:(missing=true,null))};
+  const mt=brew+kirk||1;
+  const travel={Brew:!brew?0:miMode==='drive'?miGas*brew/mt:(fMi?fMi*brew:(missing=true,null)),
+                Kirk:!kirk?0:miMode==='drive'?miGas*kirk/mt:(fMi?fMi*kirk:(missing=true,null)),
+                Aber:!aber?0:txMode==='drive'?gas(tx,S.carsTx):(fTx?fTx*aber:(missing=true,null))};
   const lodging=S.rate*S.nights*S.rooms,ppl={Brew:brew,Kirk:kirk,Aber:aber};
-  const lshare=f=>ls==='family'?lodging/3:lodging*ppl[f]/all;
+  const lshare=f=>ls==='family'?lodging/act.length:lodging*ppl[f]/all;
   let tot=0,h='<div class="wx-wrap"><table class="split"><thead><tr><th scope="col">Family</th><th scope="col">People</th><th scope="col">Travel</th><th scope="col">Lodging</th><th scope="col">Total</th></tr></thead><tbody>';
-  FAMS.forEach(f=>{const tr=travel[f],sum=tr==null?null:tr+lshare(f);if(sum!=null)tot+=sum;
+  act.forEach(f=>{const tr=travel[f],sum=tr==null?null:tr+lshare(f);if(sum!=null)tot+=sum;
     h+=`<tr><th scope="row"><span class="fam f${f}">${f}</span></th><td>${ppl[f]}</td><td>${tr==null?'<span class="muted">Enter a fare</span>':money(tr)+`<span class="wx-pop">${(f==='Aber'?txMode:miMode)==='drive'?'gas':'flights'}</span>`}</td><td>${money(lshare(f))}</td><td><strong>${sum==null?'\u2013':money(sum)}</strong></td></tr>`;});
-  h+=`</tbody><tfoot><tr><th scope="row">Everyone</th><td>${all}</td><td colspan="2"></td><td><strong>${missing?'\u2013':money(tot)}</strong></td></tr></tfoot></table></div>`;
-  h+=`<p class="hint">Michigan gas is shared between the Brews and the Kirks by headcount. Lodging is split ${ls==='family'?'equally three ways':'by number of people'}. Food and activities aren\u2019t included.${missing?' Enter fares above to fill in flight costs.':''}</p>`;
+  h+=`</tbody><tfoot><tr><th scope="row">Total</th><td>${all}</td><td colspan="2"></td><td><strong>${missing?'\u2013':money(tot)}</strong></td></tr></tfoot></table></div>`;
+  h+=`<p class="hint">${brew&&kirk?'Michigan gas is shared between the Brews and the Kirks by headcount. ':''}Lodging is split ${ls==='family'?(act.length>1?`equally ${act.length===2?'two':'three'} ways`:'to one family'):'by number of people'}. Food and activities aren\u2019t included.${missing?' Enter fares above to fill in flight costs.':''}</p>`;
   $('splitBox').innerHTML=h;
-  if(typeof renderSummary==='function'&&WX_READY)try{renderSummary();}catch(e){}
+  if(typeof renderSummary==='function'&&WX_READY)try{renderSummary();renderCompare();}catch(e){}
 }
 document.addEventListener('click',e=>{const b=e.target.closest('.split-ctl [data-k]');if(!b)return;S[b.dataset.k]=b.dataset.v;store.set('bak-settings',S);renderSplit();});
 
@@ -1884,10 +1987,10 @@ function findCity(k){return CITIES.find(c=>c[6]===k)||PAIRS.drive.cities.concat(
 function costTotal(c){
   const mode=P&&P.mode==='fly'?'fly':'drive',miMode=S.miMode||mode,txMode=S.txMode||mode;
   const mi=ORIG[$('miFrom').value],tx=ORIG[$('txFrom').value],T=[c[1],c[2]];
-  const brew=4+($('adultKid').checked?1:0),kirk=2,aber=3;
+  const pp=party(),brew=pp.brew,kirk=pp.kirk,aber=pp.aber;
   const road=o=>dist(o.ll,T)*1.2*2,gas=(o,cars)=>road(o)/S.mpg*S.gas*cars;
   const fMi=fares[c[6]+'|'+mi.ap[0]],fTx=fares[c[6]+'|'+tx.ap[0]];
-  const a=miMode==='drive'?gas(mi,S.carsMi):(fMi?fMi*(brew+kirk):null),b=txMode==='drive'?gas(tx,S.carsTx):(fTx?fTx*aber:null);
+  const a=!(brew+kirk)?0:miMode==='drive'?gas(mi,S.carsMi):(fMi?fMi*(brew+kirk):null),b=!aber?0:txMode==='drive'?gas(tx,S.carsTx):(fTx?fTx*aber:null);
   if(a==null||b==null)return null;return a+b+S.rate*S.nights*S.rooms;
 }
 let sumTok=0;
@@ -1902,7 +2005,7 @@ function renderSummary(){
     ${tile('#voteSec',sc.lead?(sc.tie?'Tied for the lead':'Leading city'):'Viewing',esc(c[0]),sc.lead?`${sc.pts} point${sc.pts===1?'':'s'} in the family vote`:'No votes yet')}
     ${tile('#datesSec','Trip dates',trip.start?esc(rangeTxt(trip.start,trip.end||trip.start)):'Not set yet',trip.start?`${days.length} day${days.length===1?'':'s'}`:(nSug?`${nSug} suggestion${nSug>1?'s':''} to answer`:'Suggest some dates'))}
     ${tile('#weatherSec','Typical weather',trip.start?'<span id="sumWx">\u2026</span>':'\u2013',trip.start?`for those dates in ${esc(c[0])}`:'Set dates to see it')}
-    ${tile('#costSec','Estimated cost',cost==null?'Enter fares':money(cost),cost==null?'Flights need fares in Trip cost':'Travel and lodging, everyone')}
+    ${tile('#costSec','Estimated cost',cost==null?'Enter fares':money(cost),cost==null?'Flights need fares in Trip cost':'Travel and lodging, whole group')}
     ${tile('#tabCal','Trip calendar',days.length?`${planned} of ${days.length} days`:'\u2013',days.length?'have something planned':'Set dates to start')}
     ${tile('#tabTodo','To-do list',td.length?`${tdDone} of ${td.length} done`:'No tasks yet',td.length?'':'Add booking tasks')}
   </div>
@@ -1933,7 +2036,7 @@ function tabCounts(){const td=Object.values(todos).filter(v=>v&&v.t),open=td.fil
 function printSummary(){
   const sc=summaryCity()||{c:city};const c=sc.c,cn=c[6],days=tripDays(),n=days.length,p=party();
   const pk=Object.values(picks).filter(v=>v.c===cn),stayN=new Set((LODGE[cn]||[]).map(a=>a[0]).concat(Object.values(customs).filter(v=>v&&v.city===cn&&v.sec==='stay').map(v=>v.n)));
-  let h=`<h1>BrewAberKirk trip to ${esc(c[0])}</h1><p class="pv-sub">${trip.start?esc(rangeTxt(trip.start,trip.end||trip.start)):'Dates not set yet'} \u00b7 ${p.mi+p.tx} people: Brew &amp; Kirk (${p.mi}) and Aber (3)</p>`;
+  let h=`<h1>${esc(tripName())}: BrewAberKirk trip to ${esc(c[0])}</h1><p class="pv-sub">${trip.start?esc(rangeTxt(trip.start,trip.end||trip.start)):'Dates not set yet'} \u00b7 ${p.mi+p.tx} people: ${[p.mi?esc(p.miLabel)+' ('+p.mi+')':'',p.tx?'Aber (3)':''].filter(Boolean).join(' and ')}</p>`;
   const stays=pk.filter(v=>stayN.has(v.n));if(stays.length)h+=`<h2>Where we're staying</h2><ul>${stays.map(v=>`<li>${esc(v.n)}${v.w?' \u2014 '+esc(v.w):''}</li>`).join('')}</ul>`;
   if(n){h+='<h2>Day by day</h2>';days.forEach((d,i)=>{const x=getDay(cn,d),tv=isTravel(x,i,n);
     h+=`<div class="pv-day"><h3>Day ${i+1}: ${esc(nice(d,{weekday:'long',month:'long',day:'numeric'}))}${tv?' \u2014 travel day':''}</h3>`;
@@ -1955,11 +2058,92 @@ $('bigText').onchange=()=>{const on=$('bigText').checked;store.set('bak-big',on)
 /* ---------- backup ---------- */
 function backup(){
   const data={app:'BrewAberKirk Halfway Point App',version:($('appVersion').textContent.match(/[\d.]+/)||[''])[0],exported:new Date().toISOString(),
-    data:{picks,suggestions:customs,destinations:places,tripDates:trip,suggestedDates:dateOpts,votes,plan,todos}};
+    trip:tripName(),data:{picks,suggestions:customs,destinations:places,tripDates:trip,suggestedDates:dateOpts,votes,plan,todos}};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='brewaberkirk-backup-'+iso(new Date())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
 }
 $('backupBtn').onclick=()=>{setNav(false);backup();};$('backupBtn2').onclick=backup;
+
+/* ---------- trips ---------- */
+function tripName(){return (trips[curTrip]&&trips[curTrip].name)||'Our trip';}
+function renderTrips(){
+  const sel=$('tripSel');if(!sel)return;
+  const ids=Object.keys(trips).sort((a,b)=>(trips[a].ts||0)-(trips[b].ts||0));
+  sel.innerHTML=ids.map(id=>`<option value="${esc(id)}"${id===curTrip?' selected':''}>${esc(trips[id].name||'Untitled trip')}</option>`).join('');
+  $('tripDel').hidden=ids.length<2;
+  const st=$('tripStatus');if(st)st.textContent=ids.length>1?`${ids.length} trips. Each has its own dates, who\u2019s going, votes, picks, calendar and to-dos.`:'';
+}
+function saveTripMeta(id,v){trips[id]=v;store.set('bak-trips',trips);renderTrips();if(LIVE)tripsCol(code).doc(id).set(v).catch(saveErr);}
+function switchTrip(id){if(!trips[id]||id===curTrip)return;flushAll();store.set('bak-curtrip',id);location.reload();}
+function flushAll(){try{if(typeof flushNote==='function')flushNote();}catch(e){}}
+function tripForm(mode){
+  const f=$('tripForm');f.hidden=false;const isNew=mode==='new';
+  f.innerHTML=`<p class="form-title">${isNew?'Start a new trip':'Rename this trip'}</p>
+   <label for="tripName">Trip name</label><input id="tripName" class="txt" maxlength="60" autocomplete="off" placeholder="For example, Summer 2027 or Grandparents' weekend" value="${isNew?'':esc(tripName())}">
+   ${isNew?'<label class="check"><input type="checkbox" id="tripCopyWho" checked> Start with the same families going as this trip</label>':''}
+   <p class="err" id="tripErr" hidden></p>
+   <div class="pick-actions"><button type="button" class="btn" id="tripSave">${isNew?'Create trip':'Save name'}</button><button type="button" class="linkbtn" id="tripCancel">Cancel</button></div>`;
+  $('tripName').focus();$('tripName').onkeydown=e=>{if(e.key==='Enter')$('tripSave').click();};
+  $('tripCancel').onclick=()=>{f.hidden=true;f.innerHTML='';};
+  $('tripSave').onclick=()=>{const n=$('tripName').value.trim().slice(0,60);
+    if(!n){$('tripErr').hidden=false;$('tripErr').textContent='Give the trip a name.';$('tripName').focus();return;}
+    if(isNew){const id='t'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      const copy=$('tripCopyWho').checked?JSON.stringify(who):null;
+      saveTripMeta(id,{name:n,by:fam||'',ts:Date.now()});
+      if(copy){try{localStorage.setItem('bak-t:'+id+':bak-who',copy);}catch(e){}
+        if(LIVE)tripsCol(code).doc(id).collection('party').doc('who').set({Brew:!!who.Brew,Aber:!!who.Aber,Kirk:!!who.Kirk,adult19:!!who.adult19,by:fam||'',ts:Date.now()}).catch(()=>{});}
+      setTimeout(()=>switchTrip(id),LIVE?400:0);}
+    else{saveTripMeta(curTrip,Object.assign({},trips[curTrip],{name:n}));f.hidden=true;f.innerHTML='';}};
+}
+$('tripSel').onchange=()=>switchTrip($('tripSel').value);
+$('tripNew').onclick=()=>tripForm('new');
+$('tripRename').onclick=()=>tripForm('rename');
+$('tripDel').onclick=async()=>{const ids=Object.keys(trips);if(ids.length<2)return;
+  if(!confirm(`Delete the trip "${tripName()}" for everyone? Its dates, votes, picks, calendar and to-dos will be deleted. Family suggestions and added destinations are kept.`))return;
+  const id=curTrip;
+  if(LIVE){try{for(const coll of TRIPCOLL){const s=await tripsCol(code).doc(id).collection(coll).get();const ps=[];s.forEach(d=>ps.push(d.ref.delete()));await Promise.all(ps);}await tripsCol(code).doc(id).delete();}catch(e){saveErr(e);return;}}
+  delete trips[id];store.set('bak-trips',trips);
+  try{Object.keys(localStorage).filter(k=>k.startsWith('bak-t:'+id+':')).forEach(k=>localStorage.removeItem(k));}catch(e){}
+  const next=Object.keys(trips).sort((a,b)=>(trips[a].ts||0)-(trips[b].ts||0))[0];store.set('bak-curtrip',next);location.reload();};
+renderTrips();
+
+/* ---------- compare finalists ---------- */
+let cmpSel=store.get('bak-compare',null);
+function allCityList(){const seen=new Set(),out=[];CITIES.forEach(c=>{if(!seen.has(c[6])){seen.add(c[6]);out.push(c);}});return out;}
+function defaultCompare(){const st=standings().map(s=>s[0]).filter(k=>findCity(k));const out=st.slice(0,3);if(out.length<2&&city&&!out.includes(city[6]))out.push(city[6]);return out.slice(0,3);}
+function renderCompare(){
+  const box=$('cmpBody');if(!box||!city)return;
+  let sel=(cmpSel||defaultCompare()).filter(k=>findCity(k)).slice(0,3);
+  const list=allCityList();
+  $('cmpPick').innerHTML=list.map(c=>`<button type="button" class="chip${isCustom(c)?' custom':''}" data-cmp="${esc(c[6])}" aria-pressed="${sel.includes(c[6])}">${esc(c[0])}</button>`).join('')+`<button type="button" class="linkbtn" id="cmpReset">Use the vote leaders</button>`;
+  $('cmpReset').onclick=()=>{cmpSel=null;store.set('bak-compare',null);renderCompare();};
+  if(sel.length<2){box.innerHTML='<p class="empty-note">Choose two or three cities above to compare them side by side.</p>';return;}
+  const cs=sel.map(findCity),pp=party(),{mi,tx}=originTexts(),fly=P&&P.mode==='fly';
+  const st=Object.fromEntries(standings());const days=tripDays();
+  const distFor=(o,c)=>{if(fly){const ap=AIRPORTS[c[6]];return ap?dist([o.ap[2],o.ap[3]],[ap[2],ap[3]]):dist(o.ll,[c[1],c[2]]);}return dist(o.ll,[c[1],c[2]]);};
+  const rows=[];
+  rows.push({h:'Family vote',v:cs.map(c=>st[c[6]]||0),fmt:v=>v?`${v} pt${v===1?'':'s'}`:'No votes',best:'max'});
+  if(pp.mi)rows.push({h:`${pp.miLabel} ${fly?'flight':'distance'}`,v:cs.map(c=>distFor(mi,c)),fmt:v=>v.toLocaleString()+' mi'});
+  if(pp.tx)rows.push({h:`Aber ${fly?'flight':'distance'}`,v:cs.map(c=>distFor(tx,c)),fmt:v=>v.toLocaleString()+' mi'});
+  if(pp.mi&&pp.tx)rows.push({h:'Fairness (difference)',v:cs.map(c=>Math.abs(distFor(mi,c)-distFor(tx,c))),fmt:v=>v.toLocaleString()+' mi',best:'min'});
+  rows.push({h:'Estimated cost',v:cs.map(c=>costTotal(c)),fmt:v=>v==null?'Enter fares':money(v),best:'min'});
+  rows.push({h:'Typical weather',v:cs.map(c=>null),fmt:()=>'',wx:true});
+  rows.push({h:'Our picks',v:cs.map(c=>Object.values(picks).filter(p=>p.c===c[6]).length),fmt:v=>String(v),best:'max'});
+  if(days.length)rows.push({h:'Days planned',v:cs.map(c=>days.filter(d=>{const x=getDay(c[6],d);return x.acts.length||MEALS.some(([k])=>x[k]&&x[k].n)||x.note;}).length),fmt:v=>`${v} of ${days.length}`,best:'max'});
+  rows.push({h:'Things to do listed',v:cs.map(c=>{const d=DATA[c[6]]||{};return (d.in||[]).length+(d.out||[]).length+((GEMS[c[6]]||[]).length)+Object.values(customs).filter(v=>v&&v.city===c[6]&&['in','out','gem'].includes(v.sec)).length;}),fmt:v=>String(v),best:'max'});
+  let h=`<div class="wx-wrap"><table class="cmp"><thead><tr><th scope="col"><span class="sr">Measure</span></th>${cs.map(c=>`<th scope="col">${esc(c[0])}<br><button type="button" class="linkbtn" data-go="${esc(c[6])}">View</button></th>`).join('')}</tr></thead><tbody>`;
+  rows.forEach((r,ri)=>{const nums=r.v.filter(x=>typeof x==='number');let bestV=null;
+    if(r.best&&nums.length>1){bestV=r.best==='min'?Math.min(...nums):Math.max(...nums);if(r.best==='max'&&bestV===0)bestV=null;if(nums.every(x=>x===bestV))bestV=null;}
+    h+=`<tr><th scope="row">${esc(r.h)}${r.note?`<span class="wx-pop">${esc(r.note)}</span>`:''}</th>${r.v.map((v,i)=>r.wx?`<td id="cmpwx-${i}">${trip.start?'\u2026':'Set dates'}</td>`:`<td class="${bestV!=null&&v===bestV?'best':''}">${r.fmt(v)}${bestV!=null&&v===bestV?'<span class="sr"> (best)</span>':''}</td>`).join('')}</tr>`;});
+  h+='</tbody></table></div><p class="hint">Green marks the best value in each row. Fairness is the difference between the two sides\u2019 distances; smaller is more even. Distances are straight-line'+(fly?' between airports':'')+'. Cost uses the fares, cars and lodging in Trip cost.</p>';
+  box.innerHTML=h;
+  if(trip.start){const tok=++cmpTok,end=trip.end||trip.start;cs.forEach((c,i)=>{getNormals(c[1],c[2],trip.start,end,[]).then(N=>{if(tok!==cmpTok)return;const hi=[],lo=[];for(let d=pd(trip.start);d<=pd(end);d.setDate(d.getDate()+1)){const x=N.by[iso(d).slice(5)];if(x){hi.push(...x.hi);lo.push(...x.lo);}}
+    const el=$('cmpwx-'+i);if(el)el.textContent=hi.length?`${deg(avg(hi))} / ${deg(avg(lo))}F`:'Not available';}).catch(()=>{const el=$('cmpwx-'+i);if(el&&tok===cmpTok)el.textContent='Not available';});});}
+}
+let cmpTok=0;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cmp]');if(!b)return;let sel=(cmpSel||defaultCompare()).filter(k=>findCity(k));const k=b.dataset.cmp;
+  if(sel.includes(k))sel=sel.filter(x=>x!==k);else{if(sel.length>=3){const m=$('cmpMsg');m.hidden=false;m.textContent='You can compare up to three cities. Tap one to remove it first.';return;}sel.push(k);}
+  $('cmpMsg').hidden=true;cmpSel=sel;store.set('bak-compare',sel);renderCompare();});
 
 /* ---------- collapsible to-do list ---------- */
 function setTodoCollapsed(c){store.set('bak-todo-collapsed',c);const b=$('todoBody'),t=$('todoTog');if(!b||!t)return;b.hidden=c;t.setAttribute('aria-expanded',c?'false':'true');t.querySelector('.coll-txt').textContent=c?'Show':'Hide';$('tabTodo').classList.toggle('is-collapsed',c);
@@ -2009,7 +2193,7 @@ dlg.addEventListener('cancel',()=>store.set('bak-welcomed',true));
 dlg.addEventListener('click',e=>{if(e.target===dlg)closeWelcome();});
 $('helpBtn').onclick=openWelcome;
 if(!store.get('bak-welcomed',false))openWelcome();
-importHash();setParty();drawPair('drive',null,true);renderWeather();renderVoteCtl();renderVotes();renderPlan();renderSplit();renderDateOpts();renderTodos();renderSummary();initSync();
+importHash();setParty();drawPair('drive',null,true);renderWeather();renderVoteCtl();renderVotes();renderPlan();renderSplit();renderDateOpts();renderTodos();renderSummary();renderCompare();initSync();
 })();
 </script>
 </body>

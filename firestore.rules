@@ -2,107 +2,81 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Put your family code here, between the single quotes. This is the only line to change.
-    function isFamily(code) { return code == 'BrewAberKirk21'; }
+    function isFamily(code) { return code == 'YOUR-FAMILY-CODE'; }
 
-    // Starred picks
-    match /halfway/{code}/picks/{pickId} {
+    function fam(v) { return v in ['Brew', 'Aber', 'Kirk']; }
+    function famOrBlank(v) { return v in ['Brew', 'Aber', 'Kirk', '']; }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function d() { return request.resource.data; }
+
+    // ----- Trip-level data (one set per trip) -----
+    function validPick() { return d().keys().hasOnly(['c', 'n', 'w', 'f'])
+      && str(d().c, 200) && str(d().n, 200) && str(d().w, 200) && d().f is list && d().f.size() <= 3; }
+    function validTripDates() { return d().keys().hasOnly(['start', 'end', 'by', 'ts'])
+      && str(d().start, 10) && str(d().end, 10) && famOrBlank(d().by) && d().ts is number; }
+    function validDateOpt() { return d().keys().hasOnly(['start', 'end', 'note', 'by', 'ts', 'resp'])
+      && d().start is string && d().start.size() == 10 && d().end is string && d().end.size() == 10
+      && str(d().note, 150) && fam(d().by) && d().ts is number
+      && d().resp is map && d().resp.keys().hasOnly(['Brew', 'Aber', 'Kirk']); }
+    function validVote(famId) { return famId in ['Brew', 'Aber', 'Kirk']
+      && d().keys().hasOnly(['r', 'by', 'ts']) && d().by == famId
+      && d().r is list && d().r.size() <= 3 && d().ts is number; }
+    function validPlanDay() { return d().keys().hasOnly(['city', 'date', 'travel', 'acts', 'b', 'l', 'dn', 'note', 'by', 'ts'])
+      && str(d().city, 120) && d().date is string && d().date.size() == 10
+      && d().travel in ['', 'yes', 'no'] && d().acts is list && d().acts.size() <= 20
+      && d().b is map && d().l is map && d().dn is map
+      && str(d().note, 1000) && str(d().by, 10) && d().ts is number; }
+    function validTodo() { return d().keys().hasOnly(['t', 'who', 'done', 'by', 'ts'])
+      && d().t is string && d().t.size() > 0 && d().t.size() <= 120
+      && d().who in ['Everyone', 'Brew', 'Aber', 'Kirk'] && d().done is bool
+      && famOrBlank(d().by) && d().ts is number; }
+    function validParty() { return d().keys().hasOnly(['Brew', 'Aber', 'Kirk', 'adult19', 'by', 'ts'])
+      && d().Brew is bool && d().Aber is bool && d().Kirk is bool && d().adult19 is bool
+      && famOrBlank(d().by) && d().ts is number; }
+
+    // Trips list (one document per trip: name, who made it, when)
+    match /halfway/{code}/trips/{tripId} {
       allow read, delete: if isFamily(code);
       allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['c', 'n', 'w', 'f'])
-        && request.resource.data.c is string && request.resource.data.c.size() <= 200
-        && request.resource.data.n is string && request.resource.data.n.size() <= 200
-        && request.resource.data.w is string && request.resource.data.w.size() <= 200
-        && request.resource.data.f is list && request.resource.data.f.size() <= 3;
+        && d().keys().hasOnly(['name', 'by', 'ts'])
+        && d().name is string && d().name.size() > 0 && d().name.size() <= 60
+        && famOrBlank(d().by) && d().ts is number;
+
+      match /picks/{id}    { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validPick(); }
+      match /trip/{id}     { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validTripDates(); }
+      match /dateOpts/{id} { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validDateOpt(); }
+      match /votes/{famId} { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validVote(famId); }
+      match /plan/{id}     { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validPlanDay(); }
+      match /todos/{id}    { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validTodo(); }
+      match /party/{id}    { allow read, delete: if isFamily(code); allow create, update: if isFamily(code) && validParty(); }
     }
 
+    // ----- Shared across all trips -----
     // Activities, restaurants and places to stay added by the family
     match /halfway/{code}/custom/{itemId} {
       allow read, delete: if isFamily(code);
       allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['city', 'sec', 'n', 'w', 'd', 'u', 'by', 'ts'])
-        && request.resource.data.sec in ['in', 'out', 'gem', 'eat', 'stay']
-        && request.resource.data.by in ['Brew', 'Aber', 'Kirk']
-        && request.resource.data.city is string && request.resource.data.city.size() <= 120
-        && request.resource.data.n is string && request.resource.data.n.size() > 0 && request.resource.data.n.size() <= 120
-        && request.resource.data.w is string && request.resource.data.w.size() <= 80
-        && request.resource.data.d is string && request.resource.data.d.size() <= 200
-        && (!('u' in request.resource.data) || (request.resource.data.u is string && request.resource.data.u.size() <= 500))
-        && request.resource.data.ts is number;
+        && d().keys().hasOnly(['city', 'sec', 'n', 'w', 'd', 'u', 'by', 'ts'])
+        && d().sec in ['in', 'out', 'gem', 'eat', 'stay'] && fam(d().by)
+        && str(d().city, 120) && d().n is string && d().n.size() > 0 && d().n.size() <= 120
+        && str(d().w, 80) && str(d().d, 200)
+        && (!('u' in d()) || str(d().u, 500)) && d().ts is number;
     }
-
     // Destinations added to the map by the family
     match /halfway/{code}/places/{placeId} {
       allow read, delete: if isFamily(code);
       allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['name', 'st', 'lat', 'lon', 'by', 'ts'])
-        && request.resource.data.by in ['Brew', 'Aber', 'Kirk']
-        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
-        && request.resource.data.st is string && request.resource.data.st.size() == 2
-        && request.resource.data.lat is number && request.resource.data.lon is number
-        && request.resource.data.ts is number;
+        && d().keys().hasOnly(['name', 'st', 'lat', 'lon', 'by', 'ts']) && fam(d().by)
+        && d().name is string && d().name.size() > 0 && d().name.size() <= 80
+        && d().st is string && d().st.size() == 2
+        && d().lat is number && d().lon is number && d().ts is number;
     }
 
-    // Shared travel dates
-    match /halfway/{code}/trip/{docId} {
-      allow read, delete: if isFamily(code);
-      allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['start', 'end', 'by', 'ts'])
-        && request.resource.data.start is string && request.resource.data.start.size() <= 10
-        && request.resource.data.end is string && request.resource.data.end.size() <= 10
-        && request.resource.data.by in ['Brew', 'Aber', 'Kirk', '']
-        && request.resource.data.ts is number;
-    }
-
-    // Each family's ranked city votes (document name is the family)
-    match /halfway/{code}/votes/{famId} {
-      allow read, delete: if isFamily(code);
-      allow create, update: if isFamily(code)
-        && famId in ['Brew', 'Aber', 'Kirk']
-        && request.resource.data.keys().hasOnly(['r', 'by', 'ts'])
-        && request.resource.data.by == famId
-        && request.resource.data.r is list && request.resource.data.r.size() <= 3
-        && request.resource.data.ts is number;
-    }
-
-    // Day-by-day trip plan (one document per city and day)
-    match /halfway/{code}/plan/{dayId} {
-      allow read, delete: if isFamily(code);
-      allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['city', 'date', 'travel', 'acts', 'b', 'l', 'dn', 'note', 'by', 'ts'])
-        && request.resource.data.city is string && request.resource.data.city.size() <= 120
-        && request.resource.data.date is string && request.resource.data.date.size() == 10
-        && request.resource.data.travel in ['', 'yes', 'no']
-        && request.resource.data.acts is list && request.resource.data.acts.size() <= 20
-        && request.resource.data.b is map && request.resource.data.l is map && request.resource.data.dn is map
-        && request.resource.data.note is string && request.resource.data.note.size() <= 1000
-        && request.resource.data.by is string && request.resource.data.by.size() <= 10
-        && request.resource.data.ts is number;
-    }
-
-    // Suggested trip dates and each family's answer (resp: Brew/Aber/Kirk -> yes, maybe or no)
-    match /halfway/{code}/dateOpts/{optId} {
-      allow read, delete: if isFamily(code);
-      allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['start', 'end', 'note', 'by', 'ts', 'resp'])
-        && request.resource.data.start is string && request.resource.data.start.size() == 10
-        && request.resource.data.end is string && request.resource.data.end.size() == 10
-        && request.resource.data.note is string && request.resource.data.note.size() <= 150
-        && request.resource.data.by in ['Brew', 'Aber', 'Kirk']
-        && request.resource.data.ts is number
-        && request.resource.data.resp is map
-        && request.resource.data.resp.keys().hasOnly(['Brew', 'Aber', 'Kirk']);
-    }
-
-    // Shared to-do list
-    match /halfway/{code}/todos/{todoId} {
-      allow read, delete: if isFamily(code);
-      allow create, update: if isFamily(code)
-        && request.resource.data.keys().hasOnly(['t', 'who', 'done', 'by', 'ts'])
-        && request.resource.data.t is string && request.resource.data.t.size() > 0 && request.resource.data.t.size() <= 120
-        && request.resource.data.who in ['Everyone', 'Brew', 'Aber', 'Kirk']
-        && request.resource.data.done is bool
-        && request.resource.data.by in ['Brew', 'Aber', 'Kirk', '']
-        && request.resource.data.ts is number;
+    // ----- Data saved before trips existed (version 1.x) -----
+    // The app copies this into your first trip automatically. Kept read-only so
+    // nothing is lost; you can delete these collections in Firebase later if you like.
+    match /halfway/{code}/{legacy}/{docId} {
+      allow read: if isFamily(code) && legacy in ['picks', 'trip', 'dateOpts', 'votes', 'plan', 'todos', 'party'];
     }
   }
 }
