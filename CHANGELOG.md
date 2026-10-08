@@ -10,6 +10,13 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 1.7.1 (October 8, 2026)
+- Changed: the trip plan is now a compact calendar. Tap a day to plan it in
+  a popup, with arrows to move between days. Day tiles show the first
+  activity, which meals are planned, and travel days.
+- Changed: the app name at the top only highlights its own text and is now a
+  link back to the top of the page, which also refreshes it.
+
 ## 1.7.0 (October 8, 2026)
 - Added: Family vote. Each family ranks its top three cities (3, 2 and 1
   points) from any city's directions panel, and the standings show the
