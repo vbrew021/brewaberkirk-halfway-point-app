@@ -545,6 +545,15 @@ table.cmp{border-collapse:collapse;width:100%;font-size:15px}
 .cmp td{white-space:nowrap}
 .cmp td.best{background:color-mix(in srgb,var(--tx) 16%,transparent);font-weight:800;color:var(--ink)}
 .cmp td.best::after{content:" \2713";color:var(--tx)}
+.all-btn{display:inline-flex;align-items:center;gap:6px;flex:none}
+.all-ic{width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-135deg);margin-top:3px}
+.all-btn.closed .all-ic{transform:rotate(45deg);margin-top:-3px}
+@media (max-width:620px){.all-btn{width:40px;min-height:40px;padding:0;justify-content:center}.all-btn .all-txt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+@media (max-width:440px){#helpBtn{display:none}.topbar{gap:6px}}
+#hero section,#hero .toggle-wrap,#hero .step-div{min-width:0;max-width:100%}
+.assume-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.wx-wrap{position:relative}
+.sr{white-space:nowrap;clip-path:inset(50%)}
 </style>
 </head>
 <body>
@@ -552,6 +561,7 @@ table.cmp{border-collapse:collapse;width:100%;font-size:15px}
   <header class="topbar">
     <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sideNav" aria-label="Jump to a section"><span></span><span></span><span></span></button>
     <a class="brand" href="./" title="Back to the top and refresh"><span class="brand-long">BrewAberKirk Halfway Point App</span><span class="brand-short" aria-hidden="true">BrewAberKirk</span></a>
+    <button type="button" class="btn small all-btn" id="allTog" aria-label="Hide all sections"><span class="all-ic" aria-hidden="true"></span><span class="all-txt">Hide all</span></button>
     <label class="who-top"><span>I'm with</span><select id="famSel" aria-label="Which family are you with?"><option value="">Choose…</option><option>Brew</option><option>Aber</option><option>Kirk</option></select></label>
     <button type="button" class="btn small help-btn" id="helpBtn" aria-label="How this works"><span class="help-long">How this works</span><span class="help-short" aria-hidden="true">?</span></button>
   </header>
@@ -587,6 +597,7 @@ table.cmp{border-collapse:collapse;width:100%;font-size:15px}
     </ul>
     <div class="nav-tools"><button type="button" class="btn small" id="expandAll">Expand all</button><button type="button" class="btn small" id="collapseAll">Collapse all</button></div>
     <div class="nav-tools col">
+      <button type="button" class="btn small" id="helpBtn2">How this works</button>
       <label class="check"><input type="checkbox" id="bigText"> Larger text</label>
       <button type="button" class="btn small" id="printBtn2">Print trip summary</button>
       <button type="button" class="btn small" id="backupBtn">Download a backup</button>
@@ -603,7 +614,7 @@ table.cmp{border-collapse:collapse;width:100%;font-size:15px}
       <li><strong>Our trip, then Step 1 and Step 2.</strong> Our trip at the top holds the overview, trip calendar and to-do list. Step 1 settles the city, dates and budget; Step 2 is for exploring places to stay, things to do and food.</li>
       <li><strong>Star favorites and vote.</strong> Tap ☆ on anything you like and vote for your top cities. Everyone sees the family’s picks, votes and plan.</li>
     </ol>
-    <p class="hint">Tips: the ☰ button at the top left jumps straight to any section, and the Hide button next to each section title tucks it away until you need it.</p>
+    <p class="hint">Tips: the ☰ button at the top left jumps straight to any section. The Hide button next to each section title tucks it away, and Hide all / Show all at the top does every section at once.</p>
     <div class="pick-actions"><button type="button" class="btn primary" id="welcomeClose">Get started</button></div>
   </dialog>
   <div class="hero" id="hero">
@@ -862,7 +873,7 @@ table.cmp{border-collapse:collapse;width:100%;font-size:15px}
   </dialog>
 
 
-  <p class="version" id="appVersion">Version 2.0.0 · October 8, 2026</p>
+  <p class="version" id="appVersion">Version 2.1.0 · October 8, 2026</p>
 
 </main>
 <div id="printView" aria-hidden="true"></div>
@@ -2176,11 +2187,15 @@ const collSecs=[];
   });
 })();
 function applyCollapsed(sec){const c=collapsed.has(sec.id),body=$(sec.id+'-body'),btn=$(sec.id+'-tog');if(!body||!btn)return;
-  body.hidden=c;sec.classList.toggle('is-collapsed',c);btn.setAttribute('aria-expanded',c?'false':'true');btn.querySelector('.coll-txt').textContent=c?'Show':'Hide';}
+  body.hidden=c;sec.classList.toggle('is-collapsed',c);btn.setAttribute('aria-expanded',c?'false':'true');btn.querySelector('.coll-txt').textContent=c?'Show':'Hide';if(typeof updateAllTog==='function')updateAllTog();}
 function setCollapsed(id,c){if(c)collapsed.add(id);else collapsed.delete(id);store.set('bak-collapsed',[...collapsed]);const s=$(id);if(s)applyCollapsed(s);}
 function ensureOpen(el){const sec=el&&el.closest&&el.closest('section.coll');if(sec&&collapsed.has(sec.id))setCollapsed(sec.id,false);}
-$('expandAll').onclick=()=>{collSecs.forEach(s=>collapsed.delete(s.id));store.set('bak-collapsed',[]);collSecs.forEach(applyCollapsed);setNav(false);};
-$('collapseAll').onclick=()=>{collSecs.forEach(s=>collapsed.add(s.id));store.set('bak-collapsed',[...collapsed]);collSecs.forEach(applyCollapsed);setNav(false);if(window.scrollTo)window.scrollTo({top:0,behavior:'smooth'});};
+function setAllCollapsed(c){collSecs.forEach(s=>{if(c)collapsed.add(s.id);else collapsed.delete(s.id);});store.set('bak-collapsed',[...collapsed]);collSecs.forEach(applyCollapsed);}
+function updateAllTog(){const b=$('allTog');if(!b)return;const anyOpen=collSecs.some(s=>!collapsed.has(s.id));b.querySelector('.all-txt').textContent=anyOpen?'Hide all':'Show all';b.setAttribute('aria-label',anyOpen?'Hide all sections':'Show all sections');b.classList.toggle('closed',!anyOpen);}
+$('allTog').onclick=()=>{const anyOpen=collSecs.some(s=>!collapsed.has(s.id));setAllCollapsed(anyOpen);if(anyOpen&&window.scrollTo)try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){}};
+$('expandAll').onclick=()=>{setAllCollapsed(false);setNav(false);};
+$('collapseAll').onclick=()=>{setAllCollapsed(true);setNav(false);if(window.scrollTo)window.scrollTo({top:0,behavior:'smooth'});};
+updateAllTog();
 const _siv=Element.prototype.scrollIntoView;
 if(_siv)Element.prototype.scrollIntoView=function(o){ensureOpen(this);return _siv.call(this,o);};
 
@@ -2192,6 +2207,7 @@ $('welcomeClose').onclick=closeWelcome;
 dlg.addEventListener('cancel',()=>store.set('bak-welcomed',true));
 dlg.addEventListener('click',e=>{if(e.target===dlg)closeWelcome();});
 $('helpBtn').onclick=openWelcome;
+$('helpBtn2').onclick=()=>{setNav(false);openWelcome();};
 if(!store.get('bak-welcomed',false))openWelcome();
 importHash();setParty();drawPair('drive',null,true);renderWeather();renderVoteCtl();renderVotes();renderPlan();renderSplit();renderDateOpts();renderTodos();renderSummary();renderCompare();initSync();
 })();

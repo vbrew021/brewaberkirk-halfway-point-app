@@ -10,6 +10,15 @@ Versions follow semantic versioning (MAJOR.MINOR.PATCH):
 
 The version number is shown at the bottom of the app.
 
+## 2.1.0 (October 8, 2026)
+- Added: a Hide all / Show all button in the top bar that collapses or
+  expands every section at once (an arrow-only button on phones). It shows
+  Hide all while any section is open.
+- Changed: on narrow phones, How this works moved into the menu to make
+  room; it's still in the top bar on larger screens.
+- Fixed: on phones, the page could scroll sideways a little because of the
+  trip cost and compare tables. Tables now scroll inside their own card.
+
 ## 2.0.0 (October 8, 2026)
 - Added: Trips. Use the Trip menu in Our trip to switch trips, + New trip to
   start another (optionally with the same families going), Rename, or

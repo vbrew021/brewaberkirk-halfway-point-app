@@ -82,8 +82,8 @@ from both, with suggested cities near it.
 
 ## Page order (top to bottom)
 
-Top bar: menu button, app name (links home), "I'm with" family chooser, How
-this works.
+Top bar: menu button, app name (links home), Hide all / Show all, "I'm
+with" family chooser, How this works (in the menu on narrow phones).
 
 On a computer the page is two independent columns (each scrolls with the
 page but grows and shrinks on its own):
